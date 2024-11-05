@@ -1,18 +1,19 @@
 import {Image, StyleSheet, Text, View} from 'react-native';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import SafeAreaWrapper from '@app/components/SafeAreaWrapper';
 import {SIZES, FONTS, COLORS} from '@app/themes/themes';
 import BottomModal from './includes/BottomModal';
 import Button from '@app/components/Button';
 import InputBox from '@app/components/InputBox';
-// import {navigate, navigateBack} from '@app/services/navigationService';
+import {navigate} from '@app/services/navigationService';
 
 type Props = {
-  navigation: any;
+  setModalVisible: (value: boolean) => void;
 };
 
 const ModalInner = (props: Props) => {
-  const {navigation} = props;
+  const {setModalVisible} = props;
+
   return (
     <View>
       <Text style={styles.headingText}>Sign In</Text>
@@ -31,7 +32,8 @@ const ModalInner = (props: Props) => {
       <Button
         label="Login"
         onPressFunction={() => {
-          navigation.navigate('BottomNavigation');
+          setModalVisible(false);
+          navigate('BottomNavigation', {});
         }}
       />
     </View>
@@ -39,7 +41,8 @@ const ModalInner = (props: Props) => {
 };
 
 const SignupScreen = (props: Props) => {
-  const {navigation} = props;
+  const [modalVisible, setModalVisible] = useState(true);
+
   return (
     <SafeAreaWrapper backgroundColor="#fff" barStyle="dark-content">
       <View style={styles.container}>
@@ -47,9 +50,9 @@ const SignupScreen = (props: Props) => {
           <Image source={require('@app/assets/images/login_page.jpg')} />
         </View>
         <BottomModal
-          children={<ModalInner navigation={navigation} />}
-          isVisible={true}
-          setVisible={() => {}}
+          children={<ModalInner setModalVisible={setModalVisible} />}
+          isVisible={modalVisible}
+          setVisible={setModalVisible}
         />
       </View>
     </SafeAreaWrapper>

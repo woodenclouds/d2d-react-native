@@ -1,14 +1,18 @@
 import {StyleSheet, Text, View, Image} from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import {COLORS, FONTS, SIZES} from '@app/themes/themes';
 import SafeAreaWrapper from '@app/components/SafeAreaWrapper';
 import BottomModal from './includes/BottomModal';
 import Button from '@app/components/Button';
 import {navigate} from '@app/services/navigationService';
 
-type Props = {};
+type Props = {
+  setModalVisible: (value: boolean) => void;
+};
 
 const WelcomeComponent = (props: Props) => {
+  const {setModalVisible} = props;
+
   return (
     <View>
       <Text style={styles.welcomeText}>
@@ -19,6 +23,7 @@ const WelcomeComponent = (props: Props) => {
       <Button
         label="Get Started"
         onPressFunction={() => {
+          setModalVisible(false);
           navigate('SignupScreen', {});
         }}
       />
@@ -27,6 +32,8 @@ const WelcomeComponent = (props: Props) => {
 };
 
 const WelcomeScreen = (props: Props) => {
+  const [modalVisible, setModalVisible] = useState(true);
+
   return (
     <SafeAreaWrapper backgroundColor="#fff" barStyle="dark-content">
       <View style={styles.container}>
@@ -34,9 +41,9 @@ const WelcomeScreen = (props: Props) => {
           <Image source={require('@app/assets/images/welcome_image.jpg')} />
         </View>
         <BottomModal
-          children={<WelcomeComponent />}
-          isVisible={true}
-          setVisible={() => {}}
+          children={<WelcomeComponent setModalVisible={setModalVisible} />}
+          isVisible={modalVisible}
+          setVisible={setModalVisible}
         />
       </View>
     </SafeAreaWrapper>
