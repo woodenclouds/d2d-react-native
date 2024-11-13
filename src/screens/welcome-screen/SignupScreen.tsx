@@ -7,11 +7,13 @@ import Button from '@app/components/Button';
 import InputBox from '@app/components/InputBox';
 import {navigate} from '@app/services/navigationService';
 
-type Props = {
+type Props = {};
+
+type ModalInnertProps = {
   setModalVisible: (value: boolean) => void;
 };
 
-const ModalInner = (props: Props) => {
+const ModalInner = (props: ModalInnertProps) => {
   const {setModalVisible} = props;
 
   return (

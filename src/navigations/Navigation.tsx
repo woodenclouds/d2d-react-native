@@ -12,7 +12,7 @@ const Navigation = () => {
   return (
     <React.Fragment>
       <Stack.Navigator
-        initialRouteName={'WelcomeScreen'}
+        initialRouteName={'BottomNavigation'}
         screenOptions={{headerShown: false}}>
         <Stack.Screen name={'WelcomeScreen'} component={WelcomeScreen} />
         <Stack.Screen name={'SignupScreen'} component={SignupScreen} />

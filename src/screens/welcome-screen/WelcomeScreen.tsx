@@ -6,11 +6,13 @@ import BottomModal from './includes/BottomModal';
 import Button from '@app/components/Button';
 import {navigate} from '@app/services/navigationService';
 
-type Props = {
+type Props = {};
+
+type WelcomeComponentProps = {
   setModalVisible: (value: boolean) => void;
 };
 
-const WelcomeComponent = (props: Props) => {
+const WelcomeComponent = (props: WelcomeComponentProps) => {
   const {setModalVisible} = props;
 
   return (

@@ -40,6 +40,10 @@ const SigninButton = (props: Props) => {
     transform: [{translateX: translationX.value}],
   }));
 
+  const opacityStyle = useAnimatedStyle(() => ({
+    opacity: 1 - translationX.value / animWidth,
+  }));
+
   const pan = Gesture.Pan()
     .minDistance(1)
     .onStart(() => {
@@ -78,15 +82,17 @@ const SigninButton = (props: Props) => {
             {!signIn ? <SigninArrow /> : <SignOutArrow />}
           </Animated.View>
         </GestureDetector>
-        <Text
+        <Animated.Text
           style={[
-            animatedStyles,
+            opacityStyle,
             styles.buttonText,
             signIn && styles.signoutButtonColor,
           ]}>
           {!signIn ? 'Swipe to sign in ' : 'Swipe to sign out'}
-        </Text>
-        <View>{!signIn ? <TripleArrow /> : <SignOutTripleArrow />}</View>
+        </Animated.Text>
+        <Animated.View style={opacityStyle}>
+          {!signIn ? <TripleArrow /> : <SignOutTripleArrow />}
+        </Animated.View>
       </View>
     </View>
   );
@@ -122,6 +128,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: SIZES.wp(16 / 4.2),
+    zIndex: 1,
   },
   buttonText: {
     ...FONTS.regular,
