@@ -2,7 +2,7 @@ import {StyleSheet, Text, View, Image} from 'react-native';
 import React, {useState} from 'react';
 import {COLORS, FONTS, SIZES} from '@app/themes/themes';
 import SafeAreaWrapper from '@app/components/SafeAreaWrapper';
-import BottomModal from './includes/BottomModal';
+import BottomModal from '@app/components/BottomModal';
 import Button from '@app/components/Button';
 import {navigate} from '@app/services/navigationService';
 

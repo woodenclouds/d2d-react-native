@@ -5,6 +5,9 @@ import WelcomeScreen from '@app/screens/welcome-screen/WelcomeScreen';
 import SignupScreen from '@app/screens/welcome-screen/SignupScreen';
 import NotificationScreen from '@app/screens/notification-screen/NotificationScreen';
 import BottomNavigation from './BottomNavigation';
+import DeliveryUpdate from '@app/screens/delivery-update/DeliveryUpdate';
+import SignatureScreens from '@app/screens/signature-screen/SignatureScreens';
+import PickupUpdate from '@app/screens/pickup-update/PickupUpdate';
 
 const Navigation = () => {
   const Stack = createNativeStackNavigator<RootStackType>();
@@ -21,6 +24,9 @@ const Navigation = () => {
           name={'NotificationScreen'}
           component={NotificationScreen}
         />
+        <Stack.Screen name={'DeliveryUpdate'} component={DeliveryUpdate} />
+        <Stack.Screen name={'SignatureScreens'} component={SignatureScreens} />
+        <Stack.Screen name={'PickupUpdate'} component={PickupUpdate} />
       </Stack.Navigator>
     </React.Fragment>
   );

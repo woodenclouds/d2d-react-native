@@ -7,4 +7,7 @@ export type RootStackType = {
   HomeScreen: undefined;
   MapScreen: undefined;
   ProfileScreen: undefined;
+  DeliveryUpdate: undefined;
+  SignatureScreens: undefined;
+  PickupUpdate: undefined;
 };

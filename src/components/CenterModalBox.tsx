@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, View, ViewStyle} from 'react-native';
 import React from 'react';
 import Modal from 'react-native-modal';
 import {SIZES} from '@app/themes/themes';
@@ -8,10 +8,19 @@ type Props = {
   isVisible: boolean;
   onBackButtonPress: () => void;
   onBackdropPress: () => void;
+  modalStyle?: ViewStyle;
+  backdropOpacity?: number;
 };
 
 const CenterModalBox = (props: Props) => {
-  const {children, isVisible, onBackButtonPress, onBackdropPress} = props;
+  const {
+    children,
+    isVisible,
+    onBackButtonPress,
+    onBackdropPress,
+    modalStyle,
+    backdropOpacity = 0.8,
+  } = props;
 
   return (
     <View>
@@ -19,14 +28,17 @@ const CenterModalBox = (props: Props) => {
         onBackButtonPress={onBackButtonPress}
         onBackdropPress={onBackdropPress}
         isVisible={isVisible}
-        backdropOpacity={0.8}
-        style={{
-          margin: 0,
-          padding: 0,
-          flex: 1,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
+        backdropOpacity={backdropOpacity}
+        style={[
+          {
+            margin: 0,
+            padding: 0,
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+          },
+          modalStyle,
+        ]}
         // propagateSwipe={true}
         useNativeDriver={false}
         // onSwipeComplete={() => setVisible(false)}

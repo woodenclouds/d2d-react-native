@@ -9,10 +9,18 @@ type Props = {
   rightIcon?: boolean;
   icon?: React.ReactNode;
   backPress?: () => void;
+  additionIconFunction?: () => void;
 };
 
 const CommonHeader = (props: Props) => {
-  const {headingText, backArrow, rightIcon, icon, backPress} = props;
+  const {
+    headingText,
+    backArrow,
+    rightIcon,
+    icon,
+    backPress,
+    additionIconFunction,
+  } = props;
   return (
     <View style={styles.container}>
       <View>
@@ -24,7 +32,13 @@ const CommonHeader = (props: Props) => {
       </View>
 
       <Text style={styles.headingText}>{headingText}</Text>
-      <View>{rightIcon && <TouchableOpacity>{icon}</TouchableOpacity>}</View>
+      <View>
+        {rightIcon && (
+          <TouchableOpacity onPress={additionIconFunction}>
+            {icon}
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 };

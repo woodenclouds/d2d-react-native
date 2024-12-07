@@ -2,7 +2,7 @@ import {Image, StyleSheet, Text, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import SafeAreaWrapper from '@app/components/SafeAreaWrapper';
 import {SIZES, FONTS, COLORS} from '@app/themes/themes';
-import BottomModal from './includes/BottomModal';
+import BottomModal from '@app/components/BottomModal';
 import Button from '@app/components/Button';
 import InputBox from '@app/components/InputBox';
 import {navigate} from '@app/services/navigationService';
