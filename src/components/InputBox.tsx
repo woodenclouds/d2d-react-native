@@ -35,7 +35,7 @@ const InputBox = (props: Props) => {
           onChangeText={onChangeText}
         />
         {password && (
-          <TouchableOpacity style={styles.iconContainer} activeOpacity={0.7}>
+          <TouchableOpacity style={styles.iconContainer} activeOpacity={0.7} onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
             <PasswordIcon />
           </TouchableOpacity>
         )}

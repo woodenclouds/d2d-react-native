@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   ViewStyle,
   TextStyle,
+  ActivityIndicator,
 } from 'react-native';
 import React from 'react';
 import {COLORS, SIZES, FONTS} from '@app/themes/themes';
@@ -16,6 +17,7 @@ type Props = {
   RightIcon?: React.ReactNode;
   buttonStyle?: ViewStyle;
   buttonTextStyle?: TextStyle;
+  loading?: boolean;
 };
 
 const Button = (props: Props) => {
@@ -26,16 +28,24 @@ const Button = (props: Props) => {
     RightIcon,
     buttonStyle,
     buttonTextStyle,
+    loading = false,
   } = props;
 
   return (
     <TouchableOpacity
       activeOpacity={0.7}
-      style={[styles.container, buttonStyle]}
-      onPress={onPressFunction}>
-      {LeftIcon}
-      <Text style={[styles.buttonText, buttonTextStyle]}>{label}</Text>
-      {RightIcon}
+      style={[styles.container, buttonStyle, loading && styles.disabledButton]}
+      onPress={loading ? undefined : onPressFunction}
+      disabled={loading}>
+      {loading ? (
+        <ActivityIndicator color="#fff" />
+      ) : (
+        <>
+          {LeftIcon}
+          <Text style={[styles.buttonText, buttonTextStyle]}>{label}</Text>
+          {RightIcon}
+        </>
+      )}
     </TouchableOpacity>
   );
 };
@@ -58,5 +68,8 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: SIZES.wp(14 / 4.2),
     marginHorizontal: SIZES.wp(10 / 4.2),
+  },
+  disabledButton: {
+    opacity: 0.7,
   },
 });

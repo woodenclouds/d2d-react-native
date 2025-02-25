@@ -22,6 +22,7 @@ const ModalInner = (props: ModalInnertProps) => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -30,6 +31,7 @@ const ModalInner = (props: ModalInnertProps) => {
     }
 
     try {
+      setIsLoading(true);
       await login(email, password);
       setModalVisible(false);
       navigation.dispatch(
@@ -40,6 +42,8 @@ const ModalInner = (props: ModalInnertProps) => {
       );
     } catch (error) {
       Alert.alert('Login Failed', 'Invalid credentials or network error');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -62,7 +66,7 @@ const ModalInner = (props: ModalInnertProps) => {
         value={password}
         onChangeText={setPassword}
       />
-      <Button label="Login" onPressFunction={handleLogin} />
+      <Button label="Login" onPressFunction={handleLogin} loading={isLoading} />
     </View>
   );
 };
