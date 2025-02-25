@@ -4,6 +4,7 @@ import {
   View,
   TouchableOpacity,
   ViewStyle,
+  TextStyle,
 } from 'react-native';
 import React from 'react';
 import {COLORS, SIZES, FONTS} from '@app/themes/themes';
@@ -14,10 +15,18 @@ type Props = {
   LeftIcon?: React.ReactNode;
   RightIcon?: React.ReactNode;
   buttonStyle?: ViewStyle;
+  buttonTextStyle?: TextStyle;
 };
 
 const Button = (props: Props) => {
-  const {label, onPressFunction, LeftIcon, RightIcon, buttonStyle} = props;
+  const {
+    label,
+    onPressFunction,
+    LeftIcon,
+    RightIcon,
+    buttonStyle,
+    buttonTextStyle,
+  } = props;
 
   return (
     <TouchableOpacity
@@ -25,7 +34,7 @@ const Button = (props: Props) => {
       style={[styles.container, buttonStyle]}
       onPress={onPressFunction}>
       {LeftIcon}
-      <Text style={styles.buttonText}>{label}</Text>
+      <Text style={[styles.buttonText, buttonTextStyle]}>{label}</Text>
       {RightIcon}
     </TouchableOpacity>
   );

@@ -11,6 +11,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 type Props = {
+  item: any;
   index: number;
   scrollX: SharedValue<number>;
   currentIndex: number;
@@ -20,7 +21,7 @@ type Props = {
 const width = SIZES.wp('100%');
 
 const CardItem = (props: Props) => {
-  const {index, scrollX, currentIndex, onPressFunction} = props;
+  const {index, scrollX, currentIndex, onPressFunction, item} = props;
 
   const swipeAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -50,7 +51,7 @@ const CardItem = (props: Props) => {
           <GreenBox />
           <View style={styles.contentSide}>
             <Text style={styles.streetName} numberOfLines={1}>
-              Ritter Street, Huntsville, AL 36301
+              {item?.address}
             </Text>
             <View style={styles.rowTextView}>
               <Text style={styles.statusText}>Delivery</Text>

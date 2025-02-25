@@ -4,9 +4,13 @@ import {SIZES, FONTS} from '@app/themes/themes';
 import ProfileIcon from '@app/assets/icons/profile_icon.svg';
 import PhoneIcon from '@app/assets/icons/phone_icon.svg';
 
-type Props = {};
+type Props = {
+  data: any;
+};
 
 const RecepientDetailsCard = (props: Props) => {
+  const {data} = props;
+
   return (
     <View style={styles.container}>
       <View style={styles.imageContainer}></View>
@@ -15,7 +19,7 @@ const RecepientDetailsCard = (props: Props) => {
           <ProfileIcon />
           <Text style={styles.labelText}>Recipient name</Text>
         </View>
-        <Text style={styles.detailText}>David Abraham</Text>
+        <Text style={styles.detailText}>{data?.recepient_name}</Text>
       </View>
       <View
         style={[styles.spacedRowContainer, {marginTop: SIZES.wp(12 / 4.2)}]}>
@@ -23,7 +27,7 @@ const RecepientDetailsCard = (props: Props) => {
           <PhoneIcon />
           <Text style={styles.labelText}>Phone number</Text>
         </View>
-        <Text style={styles.detailText}>+1 123 456 789</Text>
+        <Text style={styles.detailText}>{data?.recepient_phone}</Text>
       </View>
     </View>
   );

@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, View, ActivityIndicator} from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import {SIZES} from '@app/themes/themes';
 import Mapbox, {
@@ -14,6 +14,7 @@ import Mapbox, {
   CircleLayer,
 } from '@rnmapbox/maps';
 import {featureCollection, point} from '@turf/helpers';
+import {distance} from '@turf/turf'; // Import distance function from Turf
 import greenPin from '@app/assets/images/green_pin.png';
 import blueCar from '@app/assets/images/blue_car.png';
 import directionResponse from './includes/direction.json';
@@ -32,8 +33,26 @@ import GetLocation from 'react-native-get-location';
 import DestinationReachedModal from './includes/DestinationReachedModal';
 import OrderDetailsUpdateModal from './includes/OrderDetailsUpdateModal';
 import {navigate} from '@app/services/navigationService';
+import {assignedOrders} from '@app/services/api';
+import {useAuth} from '../../context/AuthContext';
+import {useRoute} from '@react-navigation/native';
 
 type Props = {};
+
+type RouteParams = {
+  data: {
+    address: string;
+    delivery_day: string;
+    from_time: string;
+    id: string;
+    latitude: number;
+    longitude: number;
+    order_type: string | null;
+    recepient_name: string;
+    recepient_phone: string;
+    to_time: string;
+  };
+};
 
 const accessToken =
   'pk.eyJ1Ijoic3lkLWFhbWlyIiwiYSI6ImNtMzlydG10cjE3NXQybHJ4cXJlOGR4dW0ifQ.ueSpn_8F4nz3cExguWjqEQ';
@@ -41,64 +60,171 @@ const accessToken =
 Mapbox.setAccessToken(accessToken);
 
 const MapScreen = (props: Props) => {
-  const [direction, setDirection] = useState();
+  const route = useRoute();
+  const [direction, setDirection] = useState<any>(null);
   const [myLocation, setMyLocation] = useState<[number, number] | null>(null);
   const [moreInfoVisible, setMoreInfoVisible] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const cameraRef = useRef<Mapbox.Camera | null>(null);
   const [isFollowingUser, setIsFollowingUser] = useState(false);
   const [detailsModal, setDetailsModal] = useState(false);
-  const [isDestinationReached, setDestinationReached] = useState(true);
-  const [isOrderDetailsUpdated, setOrderDetailsUpdated] = useState(false);
+  const [isDestinationReached, setDestinationReached] = useState(false);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showRoute, setShowRoute] = useState(false);
+  const {state, resetOrderDetailsUpdated} = useAuth();
+  const [isOrderDetailsUpdated, setOrderDetailsUpdated] = useState(
+    state.orderDetailsUpdated,
+  );
 
-  GetLocation.getCurrentPosition({
-    enableHighAccuracy: true,
-    timeout: 60000,
-  })
-    .then(location => {
-      // console.log(location);
-      setMyLocation([location.longitude, location.latitude]);
+  const [oderData, setOrderData] = useState<RouteParams['data'] | null>(null);
+
+  useEffect(() => {
+    if (route.params) {
+      const params = route.params as RouteParams;
+      setOrderData(params.data);
+      setDetailsModal(true);
+    }
+  }, [route.params]);
+
+  // Get current location
+  useEffect(() => {
+    const locationSubscription = GetLocation.getCurrentPosition({
+      enableHighAccuracy: true,
+      timeout: 60000,
     })
-    .catch(error => {
-      const {code, message} = error;
-      console.warn(code, message);
-    });
+      .then(location => {
+        setMyLocation([location.longitude, location.latitude]);
+      })
+      .catch(error => {
+        const {code, message} = error;
+        console.warn(code, message);
+      });
 
-  const points = [
-    point([76.043933, 11.04665], {index: 0}),
-    point([76.04809, 11.047694], {index: 1}),
-    point([76.04012, 11.050703], {index: 2}),
-    point([76.037935, 11.051412], {index: 3}),
-    point([76.0365309, 11.0512277], {index: 4}),
-    point([76.0416527, 11.0552815], {index: 5}),
-    point([76.0506219, 11.0493513], {index: 6}),
-    point([76.0408297, 11.0483076], {index: 7}),
-    point([76.0427981, 11.0545892], {index: 8}),
-    point([76.0422519, 11.0490314], {index: 9}),
-  ];
+    // Clean up location subscription if needed
+    return () => {
+      // Note: GetLocation doesn't provide a clear method in its current form, but you can handle cleanup if using a different method
+    };
+  }, []);
 
-  const locationPoints = featureCollection(points);
+  // Fetch orders and set loading state
+  useEffect(() => {
+    const fetchOrders = async () => {
+      setIsLoading(true);
+      try {
+        const data = await assignedOrders();
+        setOrders(data.data);
+        setOrderData(data.data[0]);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchOrders();
+  }, []);
 
-  const directionCoordinate = direction?.routes?.[0]?.geometry.coordinates;
+  // Automatically point to the first order and fetch directions when orders are loaded
+  useEffect(() => {
+    if (!isLoading && orders.length > 0 && myLocation) {
+      // Set the camera to focus on the first order's location
+      const firstOrderCoordinates = [orders[0].longitude, orders[0].latitude];
+      if (cameraRef.current) {
+        cameraRef.current.setCamera({
+          centerCoordinate: firstOrderCoordinates,
+          zoomLevel: 15,
+        });
+      }
+
+      // Fetch directions from myLocation to the first order
+      const fetchInitialDirections = async () => {
+        try {
+          const newDirection = await getDirections(
+            myLocation,
+            firstOrderCoordinates,
+          );
+          setDirection(newDirection);
+          setCurrentIndex(0); // Set the initial currentIndex to 0 for the first order
+        } catch (error) {
+          console.error('Failed to fetch initial directions:', error);
+        }
+      };
+      fetchInitialDirections();
+    }
+  }, [isLoading, orders, myLocation]);
+
+  // Create GeoJSON points from orders
+  const orderPoints = featureCollection(
+    orders.map((order, index) =>
+      point([order.longitude, order.latitude], {index}),
+    ),
+  );
+
+  const handleDeliverySuccessModal = () => {
+    setOrderDetailsUpdated(true);
+    resetOrderDetailsUpdated();
+  };
 
   const onPointPress = async () => {
-    const newDirection = await getDirections(
-      myLocation,
-      points[currentIndex].geometry.coordinates,
-    );
+    if (!myLocation || !orders[currentIndex]) return;
+    const newDirection = await getDirections(myLocation, [
+      orders[currentIndex].longitude,
+      orders[currentIndex].latitude,
+    ]);
     setDirection(newDirection);
+    setShowRoute(true);
   };
 
   useEffect(() => {
-    if (cameraRef.current && points[currentIndex]) {
-      const coordinates = points[currentIndex].geometry.coordinates;
+    if (cameraRef.current && orders[currentIndex]) {
+      const coordinates = [
+        orders[currentIndex].longitude,
+        orders[currentIndex].latitude,
+      ];
 
       cameraRef.current?.setCamera({
         centerCoordinate: coordinates,
         zoomLevel: 15,
       });
     }
-  }, [currentIndex]);
+  }, [currentIndex, orders]);
+
+  // Check if current location reaches the destination
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
+    const checkDistance = () => {
+      if (myLocation && orders[currentIndex] && showRoute) {
+        const currentOrderLocation = point([
+          orders[currentIndex].longitude,
+          orders[currentIndex].latitude,
+        ]);
+        const userLocation = point(myLocation);
+
+        // Calculate distance in kilometers using Turf
+        const dist = distance(userLocation, currentOrderLocation, {
+          units: 'kilometers',
+        });
+
+        // If distance is less than 0.1 km (100 meters), consider it reached
+        if (dist < 0.1) {
+          // Adjust threshold as needed (e.g., 0.05 km for 50 meters)
+          setDestinationReached(true);
+          clearInterval(intervalId); // Stop checking once destination is reached
+        }
+      }
+    };
+
+    // Start checking every second
+    intervalId = setInterval(checkDistance, 1000);
+
+    // Cleanup interval on unmount or when dependencies change
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [myLocation, orders, currentIndex, showRoute]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -110,6 +236,14 @@ const MapScreen = (props: Props) => {
       clearTimeout(timeout);
     };
   }, [moreInfoVisible]);
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaWrapper backgroundColor="#fff" barStyle="dark-content">
@@ -140,7 +274,7 @@ const MapScreen = (props: Props) => {
               scale={['interpolate', ['linear'], ['zoom'], 10, 1.0, 20, 4.0]}
             />
 
-            <ShapeSource id="locationPin" shape={locationPoints}>
+            <ShapeSource id="locationPin" shape={orderPoints}>
               <CircleLayer
                 id="circleHalo"
                 style={{
@@ -160,7 +294,7 @@ const MapScreen = (props: Props) => {
                 }}
               />
             </ShapeSource>
-            <ShapeSource id="locationPin" shape={locationPoints}>
+            <ShapeSource id="locationPin" shape={orderPoints}>
               <SymbolLayer
                 id="locationSymbol"
                 style={{
@@ -173,7 +307,7 @@ const MapScreen = (props: Props) => {
             </ShapeSource>
             <Images images={{blueCar}} />
             <Images images={{greenPin}} />
-            {directionCoordinate && (
+            {showRoute && direction?.routes?.[0]?.geometry.coordinates && (
               <ShapeSource
                 id="routeSource"
                 lineMetrics
@@ -182,7 +316,7 @@ const MapScreen = (props: Props) => {
                   type: 'Feature',
                   geometry: {
                     type: 'LineString',
-                    coordinates: directionCoordinate,
+                    coordinates: direction.routes[0].geometry.coordinates,
                   },
                 }}>
                 <LineLayer
@@ -198,10 +332,14 @@ const MapScreen = (props: Props) => {
             )}
           </MapView>
           <SwipableView
-            points={points}
+            points={orders}
             currentIndex={currentIndex}
             setCurrentIndex={setCurrentIndex}
-            onSwipeEnd={() => setIsFollowingUser(false)}
+            onSwipeEnd={() => {
+              setIsFollowingUser(false);
+              setShowRoute(false);
+              setOrderData(orders[currentIndex]);
+            }}
             setDetailsModal={setDetailsModal}
           />
           <View>
@@ -210,6 +348,7 @@ const MapScreen = (props: Props) => {
                 <RouteDetailsModal
                   setVisible={setDetailsModal}
                   onPressFunction={onPointPress}
+                  data={oderData}
                 />
               }
               isVisible={detailsModal}
@@ -229,22 +368,22 @@ const MapScreen = (props: Props) => {
               children={
                 <DestinationReachedModal
                   onPressFunction={() => {
-                    // setDestinationReached(false);
-                    navigate('DeliveryUpdate', {});
+                    setDestinationReached(false);
+                    navigate('DeliveryUpdate', {data: orders[currentIndex]});
                   }}
                 />
               }
             />
             <CenterModalBox
-              isVisible={isOrderDetailsUpdated}
+              isVisible={state.orderDetailsUpdated}
               backdropOpacity={0.3}
-              onBackButtonPress={() => {
-                setOrderDetailsUpdated(false);
-              }}
-              onBackdropPress={() => {
-                setOrderDetailsUpdated(false);
-              }}
-              children={<OrderDetailsUpdateModal />}
+              onBackButtonPress={handleDeliverySuccessModal}
+              onBackdropPress={handleDeliverySuccessModal}
+              children={
+                <OrderDetailsUpdateModal
+                  onPressFunction={handleDeliverySuccessModal}
+                />
+              }
             />
           </View>
         </View>
@@ -258,5 +397,10 @@ export default MapScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

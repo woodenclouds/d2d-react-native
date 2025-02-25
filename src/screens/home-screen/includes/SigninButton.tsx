@@ -63,6 +63,7 @@ const SigninButton = (props: Props) => {
       if (translationX.value >= maxTranslateX) {
         setSignIn((prev: boolean) => !prev);
         if (!signIn) {
+          // onSwipeComplete();
           showToast();
         } else {
           setModalVisible(true);

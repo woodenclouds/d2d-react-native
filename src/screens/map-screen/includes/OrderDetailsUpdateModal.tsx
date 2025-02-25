@@ -3,9 +3,13 @@ import React from 'react';
 import {SIZES, FONTS} from '@app/themes/themes';
 import Button from '@app/components/Button';
 
-type Props = {};
+type Props = {
+  onPressFunction: () => void;
+};
 
 const OrderDetailsUpdateModal = (props: Props) => {
+  const {onPressFunction} = props;
+
   return (
     <View style={styles.container}>
       <View style={styles.imageContiner}>
@@ -17,7 +21,7 @@ const OrderDetailsUpdateModal = (props: Props) => {
       <Text style={styles.textStyle}>Order details updated successfully.</Text>
       <Button
         label="Navigate to next order"
-        onPressFunction={() => {}}
+        onPressFunction={onPressFunction}
         buttonStyle={{marginTop: SIZES.wp(32 / 4.2)}}
       />
     </View>

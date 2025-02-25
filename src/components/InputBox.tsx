@@ -5,7 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import {COLORS, FONTS, SIZES} from '@app/themes/themes';
 import PasswordIcon from '@app/assets/icons/password_icon.svg';
 
@@ -14,10 +14,14 @@ type Props = {
   placeholder?: string;
   password?: boolean;
   keyboardType?: string;
+  value?: string;
+  onChangeText?: (text: string) => void;
 };
 
 const InputBox = (props: Props) => {
-  const {label, placeholder, password} = props;
+  const {label, placeholder, password, value, onChangeText} = props;
+  const [isPasswordVisible, setIsPasswordVisible] = useState(password);
+
   return (
     <View>
       <Text style={styles.label}>{label}</Text>
@@ -26,7 +30,9 @@ const InputBox = (props: Props) => {
           placeholder={placeholder}
           style={styles.textInput}
           placeholderTextColor={'#C3C3C3'}
-          secureTextEntry={password ? true : false}
+          secureTextEntry={isPasswordVisible}
+          value={value}
+          onChangeText={onChangeText}
         />
         {password && (
           <TouchableOpacity style={styles.iconContainer} activeOpacity={0.7}>

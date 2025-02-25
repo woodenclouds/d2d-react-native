@@ -1,11 +1,12 @@
 import {
+  ActivityIndicator,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import SafeAreaWrapper from '@app/components/SafeAreaWrapper';
 import {COLORS, SIZES, FONTS} from '@app/themes/themes';
@@ -24,12 +25,25 @@ import AppLogo from '@app/assets/icons/app_logo.svg';
 import BellIcon from '@app/assets/icons/bell_icon.svg';
 import TickWithSparkle from '@app/assets/icons/tick_with_sparkle.svg';
 
+import {useAuth} from '../../context/AuthContext';
+import {assignedOrders, orderReports} from '@app/services/api';
+
 type Props = {};
 
 const HomeScreen = (props: Props) => {
   const toast = useToast();
   const [signIn, setSignIn] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const {checkIn, checkOut, state} = useAuth();
+  const {checkInId} = state;
+
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const [reports, setReports] = useState([]);
+  const [orderReportLoading, setOrderReportLoading] = useState(true);
+  const [orderReportError, setOrderReportError] = useState(null);
 
   const CustomToast = () => {
     return (
@@ -48,6 +62,59 @@ const HomeScreen = (props: Props) => {
     });
   };
 
+  const handleCheckIn = async () => {
+    try {
+      if (!checkInId) {
+        await checkIn();
+      }
+      showToast();
+    } catch (error) {
+      console.log(error, 'Check-in failed.');
+    }
+  };
+
+  const handleCheckOut = async () => {
+    try {
+      if (checkInId) {
+        const checkin = parseInt(checkInId, 10);
+        console.log(checkin, 'checkin');
+
+        await checkOut(checkin);
+        setModalVisible(false);
+      }
+    } catch (error) {
+      console.log(error, 'Check-out failed.');
+    }
+  };
+
+  // Fetch orders on component mount
+  const fetchOrders = async () => {
+    try {
+      const data = await assignedOrders(); // Call API
+      setOrders(data); // Store data in state
+    } catch (err) {
+      setError('Failed to load orders');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchOrderReports = async () => {
+    try {
+      const data = await orderReports(); // Call API
+      setReports(data); // Store data in state
+    } catch (err) {
+      setOrderReportError('Failed to load orders');
+    } finally {
+      setOrderReportError(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+    fetchOrderReports();
+  }, []);
+
   return (
     <>
       <SafeAreaWrapper backgroundColor="#F5F7FA" barStyle="dark-content">
@@ -57,16 +124,15 @@ const HomeScreen = (props: Props) => {
               isVisible={modalVisible}
               onBackButtonPress={() => {
                 setModalVisible(false);
-                setSignIn(true);
               }}
               onBackdropPress={() => {
                 setModalVisible(false);
-                setSignIn(true);
               }}
               children={
                 <PunchOutModal
                   setModalVisible={setModalVisible}
                   setSignIn={setSignIn}
+                  onPress={handleCheckOut}
                 />
               }
             />
@@ -85,15 +151,24 @@ const HomeScreen = (props: Props) => {
                   <BellIcon />
                 </TouchableOpacity>
               </View>
-              <SpotLight />
+              <SpotLight data={reports} />
             </View>
             <SigninButton
-              showToast={showToast}
+              // onSwipeComplete={handleCheckIn}
+              showToast={handleCheckIn}
               setSignIn={setSignIn}
-              signIn={signIn}
+              signIn={checkInId ? true : false}
               setModalVisible={setModalVisible}
             />
-            <OrdersList />
+            {loading ? (
+              <ActivityIndicator size="large" color="#007bff" />
+            ) : error ? (
+              <Text style={styles.error}>{error}</Text>
+            ) : orders.length === 0 ? (
+              <Text style={styles.noOrders}>No assigned orders</Text>
+            ) : (
+              <OrdersList data={orders.data} />
+            )}
           </ScrollView>
         </GestureHandlerRootView>
       </SafeAreaWrapper>
@@ -148,5 +223,13 @@ const styles = StyleSheet.create({
     fontSize: SIZES.wp(12 / 4.2),
     color: COLORS.primary,
     marginLeft: SIZES.wp(20 / 4.2),
+  },
+  error: {
+    color: 'red',
+    fontSize: 16,
+  },
+  noOrders: {
+    fontSize: 16,
+    fontStyle: 'italic',
   },
 });

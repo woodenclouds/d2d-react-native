@@ -7,10 +7,12 @@ type Props = {
   label: string;
   containerStyle?: ViewStyle;
   icon?: React.ReactNode;
+  data: any;
+  totalDeliveries: number;
 };
 
 const TopCardItem = (props: Props) => {
-  const {containerStyle, label, icon} = props;
+  const {containerStyle, label, icon, data, totalDeliveries} = props;
 
   return (
     <View style={[styles.container, containerStyle]}>
@@ -18,19 +20,15 @@ const TopCardItem = (props: Props) => {
         <View>{icon ?? <DeliveryIcon />}</View>
         <Text style={styles.titleText}>{label}</Text>
       </View>
-      <Text style={styles.bigText}>132</Text>
-      <View style={styles.smallView}>
-        <Text style={styles.smallText}>Normal</Text>
-        <Text style={styles.smallTextNum}>110</Text>
-      </View>
-      <View style={styles.smallView}>
-        <Text style={styles.smallText}>Normal</Text>
-        <Text style={styles.smallTextNum}>110</Text>
-      </View>
-      <View style={styles.smallView}>
-        <Text style={styles.smallText}>Normal</Text>
-        <Text style={styles.smallTextNum}>110</Text>
-      </View>
+      <Text style={styles.bigText}>{totalDeliveries}</Text>
+      {Object.entries(data || {}).map(([key, value]) => (
+        <View style={styles.smallView} key={key}>
+          <Text style={styles.smallText}>
+            {key.charAt(0).toUpperCase() + key.slice(1)}
+          </Text>
+          <Text style={styles.smallTextNum}>{value}</Text>
+        </View>
+      ))}
     </View>
   );
 };

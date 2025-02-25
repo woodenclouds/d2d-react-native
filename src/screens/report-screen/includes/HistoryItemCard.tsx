@@ -1,6 +1,6 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
-import {SIZES, FONTS} from '@app/themes/themes';
+import {SIZES, FONTS, COLORS} from '@app/themes/themes';
 import Animated, {
   measure,
   runOnJS,
@@ -13,10 +13,16 @@ import Animated, {
 } from 'react-native-reanimated';
 import DeliveryIcon from '@app/assets/icons/delivery_history_icon.svg';
 import DownArrow from '@app/assets/icons/down_arrow.svg';
+import Button from '@app/components/Button';
+import {navigate} from '@app/services/navigationService';
 
-type Props = {};
+type Props = {
+  item: any;
+  type?: string;
+};
 
 const HistoryItemCard = (props: Props) => {
+  const {item} = props;
   const arrowDegree = useSharedValue('0deg');
   const animateHight = useSharedValue(0);
   const isExpanded = useSharedValue(false);
@@ -45,6 +51,7 @@ const HistoryItemCard = (props: Props) => {
   const animateViewStyle = useAnimatedStyle(() => {
     return {
       height: animateHight.value,
+      overflow: 'hidden',
     };
   });
 
@@ -57,9 +64,14 @@ const HistoryItemCard = (props: Props) => {
         <View>
           <DeliveryIcon />
         </View>
-        <Text style={styles.itemText} numberOfLines={1}>
-          2900 Ritter Street, Huntsville, AL 35805, USA
-        </Text>
+        <View>
+          <Text style={styles.itemText} numberOfLines={1}>
+            {item?.address}
+          </Text>
+          {props.type !== 'history' && (
+            <Text style={styles.subText}>{item?.delivery_day}</Text>
+          )}
+        </View>
         <Animated.View style={rotateArrowStyle}>
           <DownArrow />
         </Animated.View>
@@ -73,28 +85,57 @@ const HistoryItemCard = (props: Props) => {
           <View style={styles.imageContainer}></View>
           <View style={styles.rowViewSpace}>
             <Text style={styles.labelText}>Order type:</Text>
-            <Text style={styles.itemTextSmall}>Delivery</Text>
+            <Text style={styles.itemTextSmall}>{item?.order_type}</Text>
           </View>
           <View style={styles.rowViewSpace}>
             <Text style={styles.labelText}>Recipient name:</Text>
-            <Text style={styles.itemTextSmall}>David Abraham</Text>
+            <Text style={styles.itemTextSmall}>{item?.recipient_name}</Text>
           </View>
           <View style={styles.rowViewSpace}>
             <Text style={styles.labelText}>Phone number:</Text>
-            <Text style={styles.itemTextSmall}>+1 123 456 789</Text>
+            <Text style={styles.itemTextSmall}>{item?.recepient_phone}</Text>
           </View>
           <View style={styles.rowViewSpace}>
             <Text style={styles.labelText}>Delivery time:</Text>
             <Text style={styles.itemTextSmall}>
-              Between 10:00 am & 05:00 pm
+              Between {item?.from_time} & {item?.to_time}
             </Text>
           </View>
           <View style={styles.rowViewSpace}>
             <Text style={styles.labelText}>Address:</Text>
-            <Text style={styles.itemTextSmall}>
-              Toronto Medical Deliveries 124 street, Toronto.
-            </Text>
+            <Text style={styles.itemTextSmall}>{item?.address}</Text>
           </View>
+          {props.type !== 'history' && <View style={styles.lineView} />}
+          {props.type !== 'history' && (
+            <View
+              style={[styles.rowViewSpace, {marginBottom: SIZES.wp(20 / 4.2)}]}>
+              {props.type !== 'pickup' && props.type !== 'assigned_orders' && (
+                <Button
+                  onPressFunction={() => {
+                    navigate('DeliveryUpdate', {data: item});
+                  }}
+                  label="Deliver Now"
+                  buttonStyle={styles.whiteButton}
+                  buttonTextStyle={styles.whiteButtonText}
+                />
+              )}
+              <Button
+                onPressFunction={() => {
+                  navigate('MapScreen', {
+                    data: item,
+                  });
+                }}
+                label={
+                  props.type === 'pickup' ? 'Pickup the order' : 'Navigate Now'
+                }
+                buttonStyle={[
+                  styles.buttonStyle,
+                  (props.type === 'pickup' ||
+                    props.type === 'assigned_orders') && {width: '100%'},
+                ]}
+              />
+            </View>
+          )}
         </Animated.View>
       </Animated.View>
     </TouchableOpacity>
@@ -122,6 +163,12 @@ const styles = StyleSheet.create({
     ...FONTS.regular,
     fontSize: SIZES.wp(14 / 4.2),
     color: '#474747',
+  },
+  subText: {
+    ...FONTS.regular,
+    fontSize: SIZES.wp(12 / 4.2),
+    color: '#34B65F',
+    marginTop: SIZES.wp(4 / 4.2),
   },
   lineView: {
     width: '100%',
@@ -160,5 +207,21 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     width: '100%',
+  },
+  buttonStyle: {
+    width: '48%',
+    marginTop: SIZES.wp(24 / 4.2),
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+  },
+  whiteButton: {
+    backgroundColor: '#fff',
+    width: '48%',
+    marginTop: SIZES.wp(24 / 4.2),
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+  },
+  whiteButtonText: {
+    color: COLORS.primary,
   },
 });

@@ -2,27 +2,53 @@ import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
 import {SIZES, FONTS, COLORS} from '@app/themes/themes';
 import ArrowRight from '@app/assets/icons/arrow_right.svg';
+import FilterIcon from '@app/assets/icons/filter_icon.svg';
 import HistoryItemCard from '@app/screens/report-screen/includes/HistoryItemCard';
+import {navigate} from '@app/services/navigationService';
 
-type Props = {};
+type Props = {
+  data: any;
+};
 
 const OrdersList = (props: Props) => {
   return (
     <View style={styles.container}>
       <View style={styles.rowfullView}>
         <Text style={styles.titleText}>New Orders</Text>
-        <TouchableOpacity style={styles.rowView}>
-          <Text style={styles.buttonText}>View All</Text>
-          <View>
-            <ArrowRight />
-          </View>
-        </TouchableOpacity>
+        <View style={styles.rowView}>
+          <TouchableOpacity
+            onPress={() => {
+              navigate('OrdersPage', {});
+            }}
+            style={[
+              styles.rowView,
+              {
+                height: SIZES.wp(32 / 4.2),
+                paddingHorizontal: SIZES.wp(12 / 4.2),
+                backgroundColor: '#fff',
+                borderRadius: SIZES.wp(8 / 4.2),
+              },
+            ]}>
+            <Text style={styles.buttonText}>View All</Text>
+          </TouchableOpacity>
+          {/* <TouchableOpacity
+            style={[
+              styles.rowView,
+              {
+                height: SIZES.wp(32 / 4.2),
+                paddingHorizontal: SIZES.wp(12 / 4.2),
+                backgroundColor: '#fff',
+                borderRadius: SIZES.wp(8 / 4.2),
+                marginLeft: SIZES.wp(8 / 4.2),
+              },
+            ]}>
+            <FilterIcon />
+          </TouchableOpacity> */}
+        </View>
       </View>
-      {Array(10)
-        .fill(10)
-        .map((item, index) => (
-          <HistoryItemCard />
-        ))}
+      {props.data.map((item: any, index: number) => (
+        <HistoryItemCard item={item} key={index} type={'assigned_orders'} />
+      ))}
     </View>
   );
 };
@@ -32,6 +58,7 @@ export default OrdersList;
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: SIZES.wp(20 / 4.2),
+    marginBottom: SIZES.wp(100 / 4.2),
     width: '100%',
   },
 

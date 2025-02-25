@@ -10,4 +10,5 @@ export type RootStackType = {
   DeliveryUpdate: undefined;
   SignatureScreens: undefined;
   PickupUpdate: undefined;
+  OrdersPage: undefined;
 };

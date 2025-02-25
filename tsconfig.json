@@ -10,7 +10,7 @@
       "@app/contexts/*": ["./src/contexts/*"],
       "@app/hooks/*": ["./src/hooks/*"],
       "@app/navigations/*": ["./src/navigations/*"],
-      "app/redux/*": ["./src/redux/*"],
+      "@app/redux/*": ["./src/redux/*"],
       "@app/screens/*": ["./src/screens/*"],
       "@app/services/*": ["./src/services/*"],
       "@app/tests/*": ["./src/tests/*"],

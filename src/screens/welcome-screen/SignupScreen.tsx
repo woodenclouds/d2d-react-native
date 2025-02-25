@@ -1,4 +1,4 @@
-import {Image, StyleSheet, Text, View} from 'react-native';
+import {Alert, Image, StyleSheet, Text, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import SafeAreaWrapper from '@app/components/SafeAreaWrapper';
 import {SIZES, FONTS, COLORS} from '@app/themes/themes';
@@ -6,6 +6,8 @@ import BottomModal from '@app/components/BottomModal';
 import Button from '@app/components/Button';
 import InputBox from '@app/components/InputBox';
 import {navigate} from '@app/services/navigationService';
+import {useAuth} from '../../context/AuthContext';
+import {CommonActions, useNavigation} from '@react-navigation/native';
 
 type Props = {};
 
@@ -14,7 +16,32 @@ type ModalInnertProps = {
 };
 
 const ModalInner = (props: ModalInnertProps) => {
+  const navigation = useNavigation();
   const {setModalVisible} = props;
+  const {login} = useAuth();
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please enter email and password');
+      return;
+    }
+
+    try {
+      await login(email, password);
+      setModalVisible(false);
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{name: 'BottomNavigation'}],
+        }),
+      );
+    } catch (error) {
+      Alert.alert('Login Failed', 'Invalid credentials or network error');
+    }
+  };
 
   return (
     <View>
@@ -25,19 +52,17 @@ const ModalInner = (props: ModalInnertProps) => {
       <InputBox
         label="Email / Mobile number*"
         placeholder="Enter Email id or mobile number"
+        value={email}
+        onChangeText={setEmail}
       />
       <InputBox
         label="Password"
         placeholder="Enter your password"
         password={true}
+        value={password}
+        onChangeText={setPassword}
       />
-      <Button
-        label="Login"
-        onPressFunction={() => {
-          setModalVisible(false);
-          navigate('BottomNavigation', {});
-        }}
-      />
+      <Button label="Login" onPressFunction={handleLogin} />
     </View>
   );
 };

@@ -3,32 +3,56 @@ import React from 'react';
 import {SIZES, FONTS} from '@app/themes/themes';
 import CommonRadioButton from '@app/components/CommonRadioButton';
 
-type Props = {};
+type Props = {
+  amount?: string;
+  setAmount?: (amount: string) => void;
+  paymentMethod?: string;
+  setPaymentMethod?: (paymentMethod: string) => void;
+};
+
+const methods_type = [
+  {
+    id: 1,
+    name: 'Cash',
+  },
+  {
+    id: 2,
+    name: 'Card',
+  },
+  {
+    id: 3,
+    name: 'Cheque',
+  },
+];
 
 const PaymentDetailsCard = (props: Props) => {
+  const {amount, setAmount, paymentMethod, setPaymentMethod} = props;
   return (
     <View style={styles.container}>
       <Text style={styles.headingText}>Payment Details</Text>
       <View style={styles.boxContainer}>
         <View style={styles.inputContainer}>
           <Text style={styles.labelText}>Amount</Text>
-          <TextInput style={styles.inputStyle} placeholder="$" value="$420" />
+          <TextInput
+            style={styles.inputStyle}
+            placeholder="$"
+            value={amount}
+            onChangeText={setAmount}
+            keyboardType="numeric"
+          />
         </View>
         <View>
           <Text style={styles.labelText}>Payment method</Text>
-          <CommonRadioButton
-            containerStyle={styles.radioButtonStyle}
-            selected={true}
-            label="Cash"
-          />
-          <CommonRadioButton
-            containerStyle={styles.radioButtonStyle}
-            label="Card"
-          />
-          <CommonRadioButton
-            containerStyle={styles.radioButtonStyle}
-            label="Cheque"
-          />
+          {methods_type.map((item, index) => (
+            <CommonRadioButton
+              containerStyle={styles.radioButtonStyle}
+              selected={paymentMethod === item.name}
+              onPressFunction={() => {
+                setPaymentMethod(item.name);
+              }}
+              label={item.name}
+            />
+          ))}
         </View>
       </View>
     </View>

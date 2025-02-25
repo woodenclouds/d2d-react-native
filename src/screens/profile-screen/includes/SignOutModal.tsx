@@ -1,35 +1,33 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
-import SignOutArrow from '@app/assets/icons/signout_arrow.svg';
+import SignoutIcon from '@app/assets/icons/signout_icon.svg';
 import {SIZES, FONTS, COLORS} from '@app/themes/themes';
 
 type Props = {
   setModalVisible: (value: boolean) => void;
-  setSignIn: (value: boolean) => void;
   onPress: () => void;
 };
 
-const PunchOutModal = (props: Props) => {
-  const {setModalVisible, setSignIn, onPress} = props;
+const SignOutModal = (props: Props) => {
+  const {setModalVisible, onPress} = props;
 
   return (
     <View style={styles.container}>
       <View style={styles.rowView}>
         <View>
-          <SignOutArrow />
+          <SignoutIcon />
         </View>
-        <Text style={styles.titleText}>Punch out</Text>
+        <Text style={styles.titleText}>Sign out</Text>
       </View>
       <View style={styles.lineView} />
       <Text style={styles.exitText}>
-        Are you sure you want to punch out now?
+        Are you sure you want to Sign out now?
       </Text>
       <View style={styles.rowViewWidth}>
         <TouchableOpacity
           style={styles.buttonView}
           onPress={() => {
             setModalVisible(false);
-            setSignIn(true);
           }}>
           <Text style={styles.buttonText}>No</Text>
         </TouchableOpacity>
@@ -43,7 +41,7 @@ const PunchOutModal = (props: Props) => {
   );
 };
 
-export default PunchOutModal;
+export default SignOutModal;
 
 const styles = StyleSheet.create({
   container: {

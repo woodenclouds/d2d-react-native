@@ -15,6 +15,7 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import Navigation from '@app/navigations/Navigation';
 import {navigationRef} from '@app/services/navigationService';
 import {ToastProvider} from 'react-native-toast-notifications';
+import {AuthProvider} from './src/context/AuthContext';
 
 type Props = {};
 
@@ -101,19 +102,21 @@ const App = () => {
   }, [locationPermission]);
 
   return (
-    <ToastProvider
-      duration={1000}
-      renderToast={toastOptions => {
-        const RenderToast = toastOptions.data.renderToast;
+    <AuthProvider>
+      <ToastProvider
+        duration={1000}
+        renderToast={toastOptions => {
+          const RenderToast = toastOptions.data.renderToast;
 
-        return <RenderToast />;
-      }}>
-      <SafeAreaProvider>
-        <NavigationContainer ref={navigationRef}>
-          <Navigation />
-        </NavigationContainer>
-      </SafeAreaProvider>
-    </ToastProvider>
+          return <RenderToast />;
+        }}>
+        <SafeAreaProvider>
+          <NavigationContainer ref={navigationRef}>
+            <Navigation />
+          </NavigationContainer>
+        </SafeAreaProvider>
+      </ToastProvider>
+    </AuthProvider>
   );
 };
 

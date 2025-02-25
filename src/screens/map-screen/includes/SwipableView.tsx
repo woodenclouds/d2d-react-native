@@ -40,9 +40,10 @@ const SwipableView = (props: Props) => {
       showsHorizontalScrollIndicator={false}
       onMomentumScrollEnd={onSwipeEnd}
       onScroll={onScrollHandler}>
-      {points.map((_, index) => (
+      {points.map((item, index) => (
         <CardItem
           index={index}
+          item={item}
           scrollX={scrollX}
           currentIndex={currentIndex}
           onPressFunction={() => {

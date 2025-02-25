@@ -8,10 +8,13 @@ import NavigateArrow from '@app/assets/icons/navigate_arrow.svg';
 type Props = {
   setVisible: (data: boolean) => void;
   onPressFunction?: () => void;
+  data: any;
 };
 
 const RouteDetailsModal = (props: Props) => {
-  const {setVisible, onPressFunction} = props;
+  const {setVisible, onPressFunction, data} = props;
+
+  console.log(data, 'data=======');
 
   const navigateFunction = () => {
     onPressFunction && onPressFunction();
@@ -30,28 +33,30 @@ const RouteDetailsModal = (props: Props) => {
 
       <View style={styles.detailsContainer}>
         <Text style={styles.detailsLabel}>Order type</Text>
-        <Text style={styles.detailsText}>Delivery</Text>
+        <Text style={styles.detailsText}>{data?.order_type}</Text>
       </View>
 
       <View style={styles.detailsContainer}>
         <Text style={styles.detailsLabel}>Recipient name</Text>
-        <Text style={styles.detailsText}>David Abraham</Text>
+        <Text style={styles.detailsText}>{data?.recepient_name}</Text>
       </View>
 
       <View style={styles.detailsContainer}>
         <Text style={styles.detailsLabel}>Phone number</Text>
-        <Text style={styles.detailsText}>+1 604-555-1234</Text>
+        <Text style={styles.detailsText}>{data?.recepient_phone}</Text>
       </View>
 
       <View style={styles.detailsContainer}>
         <Text style={styles.detailsLabel}>Delivery time</Text>
-        <Text style={styles.detailsText}>Between 10:00 am & 05:00 pm</Text>
+        <Text style={styles.detailsText}>
+          Between {data?.from_time} & {data?.to_time}
+        </Text>
       </View>
 
       <View style={[styles.detailsContainer, {alignItems: 'flex-start'}]}>
         <Text style={styles.detailsLabel}>Address</Text>
         <Text style={[styles.detailsText, {textAlign: 'right'}]}>
-          2900 Ritter Street, Huntsville, 124 street, Toronto.
+          {data?.address}
         </Text>
       </View>
 

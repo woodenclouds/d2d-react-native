@@ -9,26 +9,21 @@ import React, {useState} from 'react';
 import {SIZES, FONTS, COLORS} from '@app/themes/themes';
 import ItemCard from './ItemCard';
 
-type Props = {};
+type Props = {
+  data: any;
+  attendances: any;
+};
 
 const TabItems = (props: Props) => {
+  const {data, attendances} = props;
   const [activeTab, setActiveTab] = useState(0);
 
   const personalData = [
-    {id: 1, label: 'Phone number :', value: '+91 975 536 7244'},
-    {id: 2, label: 'Email :', value: 'H6Zp5@example.com'},
-    {id: 3, label: 'Driving license :', value: 'DL-123456'},
-    {id: 4, label: 'Sin number :', value: 'SIN-123456'},
+    {id: 1, label: 'Phone number :', value: data?.phone},
+    {id: 2, label: 'Email :', value: data.credentials?.email},
+    {id: 3, label: 'Driving license :', value: data?.licence_no},
+    {id: 4, label: 'Sin number :', value: data?.sin_number},
     {id: 5, label: 'Vehicle number :', value: 'MH-12-12345'},
-  ];
-
-  const attendanceData = [
-    {id: 1, label: 'Oct 5, 2024', value: 'Present'},
-    {id: 2, label: 'Oct 6, 2024', value: 'Present'},
-    {id: 3, label: 'Oct 7, 2024', value: 'Absent'},
-    {id: 4, label: 'Oct 8, 2024', value: 'Present'},
-    {id: 5, label: 'Oct 9, 2024', value: 'Present'},
-    {id: 6, label: 'Oct 10, 2024', value: 'Present'},
   ];
 
   return (
@@ -69,12 +64,12 @@ const TabItems = (props: Props) => {
             ? personalData.map(item => (
                 <ItemCard label={item.label} valueText={item.value} />
               ))
-            : attendanceData.map(item => (
+            : attendances.map((item, index) => (
                 <ItemCard
-                  label={item.label}
+                  label={item?.date}
                   attendance={true}
-                  valueText={item.value}
-                  color={item.value === 'Absent' ? '#CE0003' : '#24AC33'}
+                  valueText={item?.status}
+                  color={item?.status === 'present' ? '#24AC33' : '#CE0003'}
                 />
               ))}
         </ScrollView>

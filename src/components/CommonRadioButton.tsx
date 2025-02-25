@@ -13,10 +13,12 @@ type Props = {
   selected?: boolean;
   label?: string;
   onPressFunction?: () => void;
+  customtextStyle?: TextStyle;
 };
 
 const CommonRadioButton = (props: Props) => {
-  const {containerStyle, selected, label, onPressFunction} = props;
+  const {containerStyle, selected, label, onPressFunction, customtextStyle} =
+    props;
 
   return (
     <TouchableOpacity
@@ -30,7 +32,12 @@ const CommonRadioButton = (props: Props) => {
       <View style={styles.outerRound}>
         {selected && <View style={styles.innerCircle} />}
       </View>
-      <Text style={[styles.textStyle, selected && styles.selectedTextStyle]}>
+      <Text
+        style={[
+          styles.textStyle,
+          selected && styles.selectedTextStyle,
+          customtextStyle,
+        ]}>
         {label ?? 'Delivery'}
       </Text>
     </TouchableOpacity>

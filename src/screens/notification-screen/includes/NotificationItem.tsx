@@ -2,25 +2,44 @@ import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
 import {SIZES, COLORS, FONTS} from '@app/themes/themes';
 import NotificationApproved from '@app/assets/icons/notification_approved.svg';
+import OrderAssigned from '@app/assets/icons/order_assigned.svg';
+import {navigate} from '@app/services/navigationService';
 
-type Props = {};
+type Props = {
+  item: any;
+};
 
 const NotificationItem = (props: Props) => {
+  const {item} = props;
   return (
     <View style={styles.container}>
       <View style={styles.leftContainer}>
         <View style={styles.notReadDot} />
-        <NotificationApproved />
+        {item.type === 'order_assignment' ? (
+          <OrderAssigned />
+        ) : (
+          <NotificationApproved />
+        )}
       </View>
       <View style={styles.rightContainer}>
         <Text style={styles.notificationText} numberOfLines={2}>
-          Your leave request from 10/12/2024 to 16/12/2024 has been approved.
-          Enjoy your time off, and we’ll see you back soon! 😊
+          {item.title}
         </Text>
-        <TouchableOpacity activeOpacity={0.7}>
-          <Text style={styles.readmoreText}>Read more</Text>
-        </TouchableOpacity>
-        <Text style={styles.dateTimeText}>12/10/2024 at 9:42 AM</Text>
+        {item.type === 'order_assignment' ? (
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={styles.buttonContainer}
+            onPress={() => {
+              navigate('OrdersPage', {});
+            }}>
+            <Text style={styles.buttonText}>View Order</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity activeOpacity={0.5}>
+            <Text style={styles.readmoreText}>Read more</Text>
+          </TouchableOpacity>
+        )}
+        <Text style={styles.dateTimeText}>{item.date_added}</Text>
       </View>
     </View>
   );
@@ -62,11 +81,28 @@ const styles = StyleSheet.create({
     ...FONTS.medium,
     fontSize: SIZES.wp(14 / 4.2),
     color: COLORS.primary,
+    textAlign: 'center',
   },
   dateTimeText: {
     marginTop: SIZES.wp(10 / 4.2),
     ...FONTS.regular,
     fontSize: SIZES.wp(12 / 4.2),
     color: '#B0B0B0',
+  },
+  buttonContainer: {
+    borderWidth: SIZES.wp(1 / 4.2),
+    borderColor: '#DDDEE1',
+    width: SIZES.wp(110 / 4.2),
+    paddingVertical: SIZES.wp(8 / 4.2),
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: SIZES.wp(6 / 4.2),
+    marginTop: SIZES.wp(8 / 4.2),
+  },
+  buttonText: {
+    ...FONTS.medium,
+    fontSize: SIZES.wp(14 / 4.2),
+    color: '#28292B',
+    textAlign: 'center',
   },
 });

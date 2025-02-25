@@ -2,9 +2,13 @@ import {Image, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import {SIZES, FONTS, COLORS} from '@app/themes/themes';
 
-type Props = {};
+type Props = {
+  data: any;
+};
 
 const SpotLight = (props: Props) => {
+  const {data} = props;
+
   return (
     <View style={styles.container}>
       <View style={styles.imageContainer}>
@@ -13,16 +17,16 @@ const SpotLight = (props: Props) => {
       <Text style={styles.welcomeText}>👋 Welcome! Anooj Reji</Text>
       <View style={styles.higlihtView}>
         <Text style={styles.titleText}>Total deliveries</Text>
-        <Text style={styles.titleCountText}>183</Text>
+        <Text style={styles.titleCountText}>{data?.total_deliveries}</Text>
       </View>
       <View style={styles.rowView}>
         <View>
-          <Text style={styles.countText}>12</Text>
+          <Text style={styles.countText}>{data?.pending_orders}</Text>
           <Text style={styles.labelText}>Pending</Text>
         </View>
         <View style={styles.dividerLine} />
         <View>
-          <Text style={styles.countText}>8</Text>
+          <Text style={styles.countText}>{data?.total_orders}</Text>
           <Text style={styles.labelText}>Completed</Text>
         </View>
       </View>
