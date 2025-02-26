@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import React, {useState} from 'react';
 import {COLORS, FONTS, SIZES} from '@app/themes/themes';
-import PasswordIcon from '@app/assets/icons/password_icon.svg';
+import PasswordVisibleIcon from '@app/assets/icons/password_visible_icon.svg';
 
 type Props = {
   label?: string;
@@ -35,8 +35,11 @@ const InputBox = (props: Props) => {
           onChangeText={onChangeText}
         />
         {password && (
-          <TouchableOpacity style={styles.iconContainer} activeOpacity={0.7} onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
-            <PasswordIcon />
+          <TouchableOpacity
+            style={styles.iconContainer}
+            activeOpacity={0.7}
+            onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
+            <PasswordVisibleIcon />
           </TouchableOpacity>
         )}
       </View>
