@@ -6,10 +6,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 
 import SafeAreaWrapper from '@app/components/SafeAreaWrapper';
-import {COLORS, SIZES, FONTS} from '@app/themes/themes';
+import { COLORS, SIZES, FONTS } from '@app/themes/themes';
 
 import SpotLight from './includes/SpotLight';
 import OrdersList from './includes/OrdersList';
@@ -17,16 +17,18 @@ import SigninButton from './includes/SigninButton';
 import CenterModalBox from '@app/components/CenterModalBox';
 import PunchOutModal from './includes/PunchOutModal';
 
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import {navigate} from '@app/services/navigationService';
-import {useToast} from 'react-native-toast-notifications';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { navigate } from '@app/services/navigationService';
+import { useToast } from 'react-native-toast-notifications';
 
 import AppLogo from '@app/assets/icons/app_logo.svg';
 import BellIcon from '@app/assets/icons/bell_icon.svg';
 import TickWithSparkle from '@app/assets/icons/tick_with_sparkle.svg';
+import CardBoard from '@app/assets/icons/card_board.svg';
+import ArrowRight from '@app/assets/icons/arrow_right.svg'
 
-import {useAuth} from '../../context/AuthContext';
-import {assignedOrders, orderReports} from '@app/services/api';
+import { useAuth } from '../../context/AuthContext';
+import { assignedOrders, orderReports } from '@app/services/api';
 
 type Props = {};
 
@@ -34,8 +36,8 @@ const HomeScreen = (props: Props) => {
   const toast = useToast();
   const [signIn, setSignIn] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const {checkIn, checkOut, state} = useAuth();
-  const {checkInId} = state;
+  const { checkIn, checkOut, state } = useAuth();
+  const { checkInId } = state;
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -58,7 +60,7 @@ const HomeScreen = (props: Props) => {
 
   const showToast = () => {
     toast.show('', {
-      data: {renderToast: () => CustomToast()},
+      data: { renderToast: () => CustomToast() },
     });
   };
 
@@ -92,7 +94,7 @@ const HomeScreen = (props: Props) => {
     try {
       const data = await assignedOrders(); // Call API
       console.log(data, 'data');
-      
+
       setOrders(data); // Store data in state
     } catch (err) {
       setError('Failed to load orders');
@@ -162,6 +164,22 @@ const HomeScreen = (props: Props) => {
               signIn={checkInId ? true : false}
               setModalVisible={setModalVisible}
             />
+
+            <TouchableOpacity
+              style={styles.pharmacy}
+              onPress={() => {
+                navigate('PharmacyScreen', {});
+              }}>
+              <CardBoard />
+              <Text style={styles.pharmacyText}>Pharmacy wise orders</Text>
+              <View style={styles.arrowContainer}>
+                <ArrowRight 
+                  width={SIZES.wp(18 / 4.2)} 
+                  height={SIZES.wp(18 / 4.2)}
+                />
+              </View>
+            </TouchableOpacity>
+
             {loading ? (
               <ActivityIndicator size="large" color="#007bff" />
             ) : error ? (
@@ -234,4 +252,29 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontStyle: 'italic',
   },
+  pharmacy: {
+    height: SIZES.wp(60 / 4.2),
+    paddingHorizontal: SIZES.wp(16 / 4.2),
+    paddingVertical: SIZES.wp(10 / 4.2),
+    marginHorizontal: SIZES.wp(20 / 4.2),
+    marginBottom: SIZES.wp(16 / 4.2),
+    borderRadius: SIZES.wp(16 / 4.2),
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    gap: 4, 
+  },
+  pharmacyText: {
+    ...FONTS.regular,
+    fontSize: SIZES.wp(14 / 4.2),
+    lineHeight: 17,
+    color: "#0A0A0A",
+    flex: 1,
+  },
+  arrowContainer: {
+    backgroundColor: "#EEF0F1",
+    padding: SIZES.wp(12 / 4.2),
+    borderRadius: SIZES.wp(20 / 4.2)
+  }
 });

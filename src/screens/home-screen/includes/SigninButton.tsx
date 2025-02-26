@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     width: SIZES.wp(375 / 4.2),
     backgroundColor: '#1A1D21',
     height: SIZES.wp(52 / 4.2),
-    marginTop: SIZES.wp(74 / 4.2),
+    marginTop: SIZES.wp(85 / 4.2),
     alignSelf: 'center',
     borderRadius: SIZES.wp(48 / 4.2),
     padding: SIZES.wp(5 / 4.2),

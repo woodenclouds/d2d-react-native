@@ -11,4 +11,6 @@ export type RootStackType = {
   SignatureScreens: undefined;
   PickupUpdate: undefined;
   OrdersPage: undefined;
+  PharmacyScreen: undefined;
+  PharmacyWiseOrder: undefined;
 };

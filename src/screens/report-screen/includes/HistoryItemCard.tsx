@@ -1,6 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React from 'react';
 import { SIZES, FONTS, COLORS } from '@app/themes/themes';
+import { convertToAMPM } from '@app/utils/dateTime';
 import Animated, {
   measure,
   runOnJS,
@@ -23,6 +24,8 @@ type Props = {
 
 const HistoryItemCard = (props: Props) => {
   const { item } = props;
+  console.log(item, "item");
+
   const arrowDegree = useSharedValue('0deg');
   const animateHight = useSharedValue(0);
   const isExpanded = useSharedValue(false);
@@ -85,7 +88,7 @@ const HistoryItemCard = (props: Props) => {
           <View style={styles.imageContainer}>
             <View style={styles.rowViewSpace}>
               <Text style={styles.labelText}>Order id</Text>
-              <Text style={styles.itemTextSmall}>{item?.id}</Text>
+              <Text style={styles.itemTextSmall}>#3498590</Text>
             </View>
             <View style={styles.rowViewSpace}>
               <Text style={styles.labelText}>Order type</Text>
@@ -93,21 +96,25 @@ const HistoryItemCard = (props: Props) => {
             </View>
           </View>
           <View style={styles.rowViewSpace}>
-            <Text style={styles.labelText}>Recipient name:</Text>
-            <Text style={styles.itemTextSmall}>{item?.recipient_name}</Text>
+            <Text style={styles.labelText}>Recipient name</Text>
+            <Text style={styles.itemTextSmall}>{item?.recepient_name}</Text>
           </View>
           <View style={styles.rowViewSpace}>
-            <Text style={styles.labelText}>Phone number:</Text>
+            <Text style={styles.labelText}>Phone number</Text>
             <Text style={styles.itemTextSmall}>{item?.recepient_phone}</Text>
           </View>
           <View style={styles.rowViewSpace}>
-            <Text style={styles.labelText}>Delivery time:</Text>
+            <Text style={styles.labelText}>Pickup</Text>
+            <Text style={styles.itemTextSmall}>{item?.address}</Text>
+          </View>
+          <View style={styles.rowViewSpace}>
+            <Text style={styles.labelText}>Delivery time</Text>
             <Text style={styles.itemTextSmall}>
-              Between {item?.from_time} & {item?.to_time}
+              Between {convertToAMPM(item?.from_time)} & {convertToAMPM(item?.to_time)}
             </Text>
           </View>
           <View style={styles.rowViewSpace}>
-            <Text style={styles.labelText}>Address:</Text>
+            <Text style={styles.labelText}>Address</Text>
             <Text style={styles.itemTextSmall}>{item?.address}</Text>
           </View>
           {props.type !== 'history' && <View style={styles.lineView} />}
@@ -179,7 +186,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: SIZES.wp(1 / 4.2),
     backgroundColor: '#F5F7FA',
-    marginTop: SIZES.wp(20 / 4.2),
+    marginTop: SIZES.wp(16 / 4.2),
     marginBottom: SIZES.wp(10 / 4.2),
   },
   imageContainer: {
@@ -200,12 +207,12 @@ const styles = StyleSheet.create({
   labelText: {
     ...FONTS.regular,
     fontSize: SIZES.wp(13 / 4.2),
-    color: '#7F7F7F',
+    color: '#4C4C4C',
   },
   itemTextSmall: {
     ...FONTS.regular,
     fontSize: SIZES.wp(13 / 4.2),
-    color: '#474747',
+    color: '#212529',
     maxWidth: SIZES.wp(190 / 4.2),
     textAlign: 'right',
   },

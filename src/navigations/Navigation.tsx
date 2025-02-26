@@ -11,6 +11,8 @@ import PickupUpdate from '@app/screens/pickup-update/PickupUpdate';
 import OrdersPage from '@app/screens/orders-viewall/OrdersPage';
 import {useAuth} from '../context/AuthContext';
 import {ActivityIndicator, View} from 'react-native';
+import PharmacyScreen from '@app/screens/pharmacy-screen/PharmacyScreen';
+import PharmacyWiseOrder from '@app/screens/pharmacy-screen/PharmacyWiseOrder';
 
 const Navigation = () => {
   const Stack = createNativeStackNavigator<RootStackType>();
@@ -44,6 +46,8 @@ const Navigation = () => {
         <Stack.Screen name={'SignatureScreens'} component={SignatureScreens} />
         <Stack.Screen name={'PickupUpdate'} component={PickupUpdate} />
         <Stack.Screen name={'OrdersPage'} component={OrdersPage} />
+        <Stack.Screen name={'PharmacyScreen'} component={PharmacyScreen} />
+        <Stack.Screen name={'PharmacyWiseOrder'} component={PharmacyWiseOrder} />
       </Stack.Navigator>
     </React.Fragment>
   );
