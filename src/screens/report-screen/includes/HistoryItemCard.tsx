@@ -1,6 +1,7 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React from 'react';
-import {SIZES, FONTS, COLORS} from '@app/themes/themes';
+import { SIZES, FONTS, COLORS } from '@app/themes/themes';
+import { convertToAMPM } from '@app/utils/dateTime';
 import Animated, {
   measure,
   runOnJS,
@@ -14,7 +15,7 @@ import Animated, {
 import DeliveryIcon from '@app/assets/icons/delivery_history_icon.svg';
 import DownArrow from '@app/assets/icons/down_arrow.svg';
 import Button from '@app/components/Button';
-import {navigate} from '@app/services/navigationService';
+import { navigate } from '@app/services/navigationService';
 
 type Props = {
   item: any;
@@ -22,7 +23,8 @@ type Props = {
 };
 
 const HistoryItemCard = (props: Props) => {
-  const {item} = props;
+  const { item } = props;
+
   const arrowDegree = useSharedValue('0deg');
   const animateHight = useSharedValue(0);
   const isExpanded = useSharedValue(false);
@@ -44,7 +46,7 @@ const HistoryItemCard = (props: Props) => {
 
   const rotateArrowStyle = useAnimatedStyle(() => {
     return {
-      transform: [{rotate: withTiming(arrowDegree.value)}],
+      transform: [{ rotate: withTiming(arrowDegree.value) }],
     };
   });
 
@@ -82,37 +84,46 @@ const HistoryItemCard = (props: Props) => {
           collapsable={false}
           style={[styles.contentView]}>
           <View style={styles.lineView} />
-          <View style={styles.imageContainer}></View>
-          <View style={styles.rowViewSpace}>
-            <Text style={styles.labelText}>Order type:</Text>
-            <Text style={styles.itemTextSmall}>{item?.order_type}</Text>
+          <View style={styles.imageContainer}>
+            <View style={styles.rowViewSpace}>
+              <Text style={styles.labelText}>Order id</Text>
+              <Text style={styles.itemTextSmall}>#3498590</Text>
+            </View>
+            <View style={styles.rowViewSpace}>
+              <Text style={styles.labelText}>Order type</Text>
+              <Text style={styles.itemTextSmall}>{item?.order_type}</Text>
+            </View>
           </View>
           <View style={styles.rowViewSpace}>
-            <Text style={styles.labelText}>Recipient name:</Text>
-            <Text style={styles.itemTextSmall}>{item?.recipient_name}</Text>
+            <Text style={styles.labelText}>Recipient name</Text>
+            <Text style={styles.itemTextSmall}>{item?.recepient_name}</Text>
           </View>
           <View style={styles.rowViewSpace}>
-            <Text style={styles.labelText}>Phone number:</Text>
+            <Text style={styles.labelText}>Phone number</Text>
             <Text style={styles.itemTextSmall}>{item?.recepient_phone}</Text>
           </View>
           <View style={styles.rowViewSpace}>
-            <Text style={styles.labelText}>Delivery time:</Text>
+            <Text style={styles.labelText}>Pickup</Text>
+            <Text style={styles.itemTextSmall}>{item?.address}</Text>
+          </View>
+          <View style={styles.rowViewSpace}>
+            <Text style={styles.labelText}>Delivery time</Text>
             <Text style={styles.itemTextSmall}>
-              Between {item?.from_time} & {item?.to_time}
+              Between {convertToAMPM(item?.from_time)} & {convertToAMPM(item?.to_time)}
             </Text>
           </View>
           <View style={styles.rowViewSpace}>
-            <Text style={styles.labelText}>Address:</Text>
+            <Text style={styles.labelText}>Address</Text>
             <Text style={styles.itemTextSmall}>{item?.address}</Text>
           </View>
           {props.type !== 'history' && <View style={styles.lineView} />}
           {props.type !== 'history' && (
             <View
-              style={[styles.rowViewSpace, {marginBottom: SIZES.wp(20 / 4.2)}]}>
+              style={[styles.rowViewSpace, { marginBottom: SIZES.wp(20 / 4.2) }]}>
               {props.type !== 'pickup' && props.type !== 'assigned_orders' && (
                 <Button
                   onPressFunction={() => {
-                    navigate('DeliveryUpdate', {data: item});
+                    navigate('DeliveryUpdate', { data: item });
                   }}
                   label="Deliver Now"
                   buttonStyle={styles.whiteButton}
@@ -131,7 +142,7 @@ const HistoryItemCard = (props: Props) => {
                 buttonStyle={[
                   styles.buttonStyle,
                   (props.type === 'pickup' ||
-                    props.type === 'assigned_orders') && {width: '100%'},
+                    props.type === 'assigned_orders') && { width: '100%' },
                 ]}
               />
             </View>
@@ -174,15 +185,16 @@ const styles = StyleSheet.create({
     width: '100%',
     height: SIZES.wp(1 / 4.2),
     backgroundColor: '#F5F7FA',
-    marginTop: SIZES.wp(20 / 4.2),
+    marginTop: SIZES.wp(16 / 4.2),
     marginBottom: SIZES.wp(10 / 4.2),
   },
   imageContainer: {
     width: '100%',
     height: SIZES.wp(100 / 4.2),
-    backgroundColor: '#F5F7FA',
+    backgroundColor: '#F4F7FF',
     borderRadius: SIZES.wp(6 / 4.2),
     marginBottom: SIZES.wp(16 / 4.2),
+    padding: SIZES.wp(20 / 4.2),
   },
   rowViewSpace: {
     flexDirection: 'row',
@@ -194,12 +206,12 @@ const styles = StyleSheet.create({
   labelText: {
     ...FONTS.regular,
     fontSize: SIZES.wp(13 / 4.2),
-    color: '#7F7F7F',
+    color: '#4C4C4C',
   },
   itemTextSmall: {
     ...FONTS.regular,
     fontSize: SIZES.wp(13 / 4.2),
-    color: '#474747',
+    color: '#212529',
     maxWidth: SIZES.wp(190 / 4.2),
     textAlign: 'right',
   },
