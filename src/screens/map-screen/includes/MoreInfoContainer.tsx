@@ -1,11 +1,29 @@
 import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import {SIZES, FONTS, COLORS} from '@app/themes/themes';
+import VioletRoundIcon from '@app/assets/icons/violet_round_icon.svg';
 import GreenRoundIcon from '@app/assets/icons/green_round_icon.svg';
-import RedRoundIcon from '@app/assets/icons/red_round_icon.svg';
 import OrangeRoundIcon from '@app/assets/icons/orange_round_icon.svg';
 import BlueRoundIcon from '@app/assets/icons/blue_round_icon.svg';
-import SkyBlueRoundIcon from '@app/assets/icons/skyblue_round_icon.svg';
+
+const LABELS = [
+  {
+    label: 'Pending',
+    icon: <VioletRoundIcon />,
+  },
+  {
+    label: 'Picked up',
+    icon: <GreenRoundIcon />,
+  },
+  {
+    label: 'Attempted',
+    icon: <OrangeRoundIcon />,
+  },
+  {
+    label: 'Pharmacy',
+    icon: <BlueRoundIcon />,
+  },
+];
 
 type Props = {
   isVisible?: boolean;
@@ -16,26 +34,14 @@ const MoreInfoContainer = (props: Props) => {
 
   return (
     <View style={[styles.container, {display: isVisible ? 'flex' : 'none'}]}>
-      <View style={[styles.itemView, {marginBottom: SIZES.wp(17 / 4.2)}]}>
-        <GreenRoundIcon />
-        <Text style={styles.labelText}>Picked up</Text>
-      </View>
-      <View style={[styles.itemView, {marginBottom: SIZES.wp(17 / 4.2)}]}>
-        <SkyBlueRoundIcon />
-        <Text style={styles.labelText}>Pickup</Text>
-      </View>
-      <View style={[styles.itemView, {marginBottom: SIZES.wp(17 / 4.2)}]}>
-        <OrangeRoundIcon />
-        <Text style={styles.labelText}>Pending</Text>
-      </View>
-      <View style={styles.itemView}>
-        <RedRoundIcon />
-        <Text style={styles.labelText}>Upcoming</Text>
-      </View>
-      <View style={styles.itemView}>
-        <BlueRoundIcon />
-        <Text style={styles.labelText}>Pharmacy</Text>
-      </View>
+      {LABELS.map((item, index) => (
+        <View
+          key={index}
+          style={[styles.itemView, {marginBottom: SIZES.wp(17 / 4.2)}]}>
+          {item.icon}
+          <Text style={styles.labelText}>{item.label}</Text>
+        </View>
+      ))}
     </View>
   );
 };

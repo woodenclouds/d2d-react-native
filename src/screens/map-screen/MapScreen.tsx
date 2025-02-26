@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View, ActivityIndicator} from 'react-native';
+import {StyleSheet, Text, View, ActivityIndicator, Alert} from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import {SIZES} from '@app/themes/themes';
 import Mapbox, {
@@ -36,6 +36,7 @@ import {navigate} from '@app/services/navigationService';
 import {assignedOrders} from '@app/services/api';
 import {useAuth} from '../../context/AuthContext';
 import {useRoute} from '@react-navigation/native';
+import {Linking} from 'react-native';
 
 type Props = {};
 
@@ -166,13 +167,44 @@ const MapScreen = (props: Props) => {
   };
 
   const onPointPress = async () => {
+    // if (!myLocation || !orders[currentIndex]) return;
+    // const newDirection = await getDirections(myLocation, [
+    //   orders[currentIndex].longitude,
+    //   orders[currentIndex].latitude,
+    // ]);
+    // setDirection(newDirection);
+    // setShowRoute(true);
+
     if (!myLocation || !orders[currentIndex]) return;
-    const newDirection = await getDirections(myLocation, [
-      orders[currentIndex].longitude,
-      orders[currentIndex].latitude,
-    ]);
-    setDirection(newDirection);
-    setShowRoute(true);
+
+    // Construct Google Maps URL with current location and destination
+    const destinationLat = orders[currentIndex].latitude;
+    const destinationLng = orders[currentIndex].longitude;
+    const sourceLat = myLocation[1]; // Latitude is the second element in [longitude, latitude]
+    const sourceLng = myLocation[0]; // Longitude is the first element in [longitude, latitude]
+
+    // Google Maps URL for navigation (walking mode, as per your getDirections)
+    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${sourceLat},${sourceLng}&destination=${destinationLat},${destinationLng}&travelmode=walking`;
+
+    try {
+      // Attempt to open the Google Maps app
+      const supported = await Linking.canOpenURL(googleMapsUrl);
+      if (supported) {
+        await Linking.openURL(googleMapsUrl);
+      } else {
+        console.log(
+          'Google Maps app is not installed. Falling back to browser.',
+        );
+        // Optionally open in a web browser if the app isn’t installed
+        await Linking.openURL(googleMapsUrl);
+      }
+    } catch (error) {
+      console.error('Failed to open Google Maps:', error);
+      Alert.alert(
+        'Error',
+        'Could not open Google Maps. Please ensure the app is installed.',
+      );
+    }
   };
 
   useEffect(() => {
@@ -307,7 +339,7 @@ const MapScreen = (props: Props) => {
             </ShapeSource>
             <Images images={{blueCar}} />
             <Images images={{greenPin}} />
-            {showRoute && direction?.routes?.[0]?.geometry.coordinates && (
+            {/* {showRoute && direction?.routes?.[0]?.geometry.coordinates && (
               <ShapeSource
                 id="routeSource"
                 lineMetrics
@@ -329,7 +361,7 @@ const MapScreen = (props: Props) => {
                   }}
                 />
               </ShapeSource>
-            )}
+            )} */}
           </MapView>
           <SwipableView
             points={orders}
