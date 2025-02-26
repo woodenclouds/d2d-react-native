@@ -21,7 +21,6 @@ const PharmacyWiseOrder = ({ route }) => {
     const fetchOrders = async () => {
         try {
             const data = await assignedOrders(); // Call API
-            console.log(data, 'data');
             setOrders(data.data); // Store data in state
         } catch (err) {
             setError('Failed to load orders');
