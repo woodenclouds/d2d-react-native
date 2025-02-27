@@ -1,7 +1,7 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
-import { SIZES, FONTS, COLORS } from '@app/themes/themes';
-import { convertToAMPM } from '@app/utils/dateTime';
+import {SIZES, FONTS, COLORS} from '@app/themes/themes';
+import {convertToAMPM} from '@app/utils/dateTime';
 import Animated, {
   measure,
   runOnJS,
@@ -15,7 +15,7 @@ import Animated, {
 import DeliveryIcon from '@app/assets/icons/delivery_history_icon.svg';
 import DownArrow from '@app/assets/icons/down_arrow.svg';
 import Button from '@app/components/Button';
-import { navigate } from '@app/services/navigationService';
+import {navigate} from '@app/services/navigationService';
 
 type Props = {
   item: any;
@@ -23,7 +23,7 @@ type Props = {
 };
 
 const HistoryItemCard = (props: Props) => {
-  const { item } = props;
+  const {item} = props;
 
   const arrowDegree = useSharedValue('0deg');
   const animateHight = useSharedValue(0);
@@ -46,7 +46,7 @@ const HistoryItemCard = (props: Props) => {
 
   const rotateArrowStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ rotate: withTiming(arrowDegree.value) }],
+      transform: [{rotate: withTiming(arrowDegree.value)}],
     };
   });
 
@@ -109,7 +109,8 @@ const HistoryItemCard = (props: Props) => {
           <View style={styles.rowViewSpace}>
             <Text style={styles.labelText}>Delivery time</Text>
             <Text style={styles.itemTextSmall}>
-              Between {convertToAMPM(item?.from_time)} & {convertToAMPM(item?.to_time)}
+              Between {convertToAMPM(item?.from_time)} &{' '}
+              {convertToAMPM(item?.to_time)}
             </Text>
           </View>
           <View style={styles.rowViewSpace}>
@@ -119,11 +120,11 @@ const HistoryItemCard = (props: Props) => {
           {props.type !== 'history' && <View style={styles.lineView} />}
           {props.type !== 'history' && (
             <View
-              style={[styles.rowViewSpace, { marginBottom: SIZES.wp(20 / 4.2) }]}>
+              style={[styles.rowViewSpace, {marginBottom: SIZES.wp(20 / 4.2)}]}>
               {props.type !== 'pickup' && props.type !== 'assigned_orders' && (
                 <Button
                   onPressFunction={() => {
-                    navigate('DeliveryUpdate', { data: item });
+                    navigate('DeliveryUpdate', {data: item});
                   }}
                   label="Deliver Now"
                   buttonStyle={styles.whiteButton}
@@ -142,7 +143,7 @@ const HistoryItemCard = (props: Props) => {
                 buttonStyle={[
                   styles.buttonStyle,
                   (props.type === 'pickup' ||
-                    props.type === 'assigned_orders') && { width: '100%' },
+                    props.type === 'assigned_orders') && {width: '100%'},
                 ]}
               />
             </View>

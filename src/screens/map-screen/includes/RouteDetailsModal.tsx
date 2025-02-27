@@ -1,4 +1,10 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  Touchable,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React from 'react';
 import {SIZES, FONTS, COLORS} from '@app/themes/themes';
 import Button from '@app/components/Button';
@@ -29,7 +35,16 @@ const RouteDetailsModal = (props: Props) => {
         <Text style={styles.titleText}>Order details</Text>
       </View>
       <View style={styles.DashLine}></View>
-      <View style={styles.imageContiner}></View>
+      <View style={styles.greyContainer}>
+        <View style={styles.rowContainer}>
+          <Text style={styles.detailsLabel}>Order id</Text>
+          <Text style={styles.detailsText}>{data?.order_id}</Text>
+        </View>
+        <View style={styles.rowContainer}>
+          <Text style={styles.detailsLabel}>Order type</Text>
+          <Text style={styles.detailsText}>{data?.order_type}</Text>
+        </View>
+      </View>
 
       <View style={styles.detailsContainer}>
         <Text style={styles.detailsLabel}>Order type</Text>
@@ -61,8 +76,22 @@ const RouteDetailsModal = (props: Props) => {
       </View>
 
       <View style={styles.DashLine}></View>
+      <View
+        style={[
+          styles.rowContainer,
+          {
+            marginBottom: SIZES.wp(8 / 4.2),
+          },
+        ]}>
+        <TouchableOpacity style={styles.buttonContainer}>
+          <Text style={styles.buttonText}>Deliver</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.buttonContainer}>
+          <Text style={styles.buttonText}>0 Attempted</Text>
+        </TouchableOpacity>
+      </View>
       <Button
-        label="Navigate now"
+        label="Navigate to delivery location"
         LeftIcon={<NavigateArrow />}
         onPressFunction={navigateFunction}
         buttonStyle={{marginTop: 0}}
@@ -103,12 +132,32 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F7FA',
     marginBottom: SIZES.wp(20 / 4.2),
   },
-  imageContiner: {
+  greyContainer: {
     width: '100%',
-    height: SIZES.wp(140 / 4.2),
+    padding: SIZES.wp(20 / 4.2),
     backgroundColor: '#F5F7FA',
     borderRadius: SIZES.wp(6 / 4.2),
     marginBottom: SIZES.wp(20 / 4.2),
+  },
+  rowContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  buttonContainer: {
+    width: '48%',
+    borderColor: '#003FF0',
+    borderWidth: SIZES.wp(1 / 4.2),
+    borderRadius: SIZES.wp(6 / 4.2),
+    paddingVertical: SIZES.wp(15 / 4.2),
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonText: {
+    ...FONTS.regular,
+    fontSize: SIZES.wp(14 / 4.2),
+    color: '#003FF0',
   },
   detailsContainer: {
     width: '100%',
