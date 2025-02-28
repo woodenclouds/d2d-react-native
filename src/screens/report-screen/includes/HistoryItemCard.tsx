@@ -12,10 +12,14 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import DeliveryIcon from '@app/assets/icons/delivery_history_icon.svg';
+import DeliveryIcon from '@app/assets/icons/delivery_green_icon.svg';
+import DeliveredIcon from '@app/assets/icons/delivery_icon.svg';
+import PickupIcon from '@app/assets/icons/pickup_icon.svg';
+import AttemptIcon from '@app/assets/icons/attempt_icon.svg';
 import DownArrow from '@app/assets/icons/down_arrow.svg';
 import Button from '@app/components/Button';
 import {navigate} from '@app/services/navigationService';
+import {openGoogleMapsNavigation} from '@app/utils/navigationUtils';
 
 type Props = {
   item: any;
@@ -57,6 +61,11 @@ const HistoryItemCard = (props: Props) => {
     };
   });
 
+  const handleGoogleMapsNavigation = () => {
+    if (!item.latitude || !item.longitude) return;
+    openGoogleMapsNavigation(item.latitude, item.longitude);
+  };
+
   return (
     <TouchableOpacity
       style={styles.container}
@@ -64,15 +73,32 @@ const HistoryItemCard = (props: Props) => {
       onPress={() => onToggle()}>
       <View style={styles.rowView}>
         <View>
-          <DeliveryIcon />
+          {props.type === 'history' ? (
+            <DeliveredIcon />
+          ) : item.is_pickup && item.status === 'pending' ? (
+            <PickupIcon />
+          ) : !item.is_pickup && item.status === 'pending' ? (
+            <DeliveryIcon />
+          ) : (
+            <AttemptIcon />
+          )}
         </View>
         <View>
           <Text style={styles.itemText} numberOfLines={1}>
             {item?.address}
           </Text>
-          {props.type !== 'history' && (
-            <Text style={styles.subText}>{item?.delivery_day}</Text>
-          )}
+          {props.type !== 'history' &&
+            (!item.is_pickup ? (
+              item.status === 'pending' && (
+                <Text style={styles.subText}>Delivered within 30 min</Text>
+              )
+            ) : item.is_pickup && item.status === 'pending' ? (
+              <Text style={styles.subText}>Pickup within 30 min</Text>
+            ) : (
+              <Text style={styles.subText}>
+                Attempted {item.attempted_count} time
+              </Text>
+            ))}
         </View>
         <Animated.View style={rotateArrowStyle}>
           <DownArrow />
@@ -119,34 +145,36 @@ const HistoryItemCard = (props: Props) => {
           </View>
           {props.type !== 'history' && <View style={styles.lineView} />}
           {props.type !== 'history' && (
-            <View
-              style={[styles.rowViewSpace, {marginBottom: SIZES.wp(20 / 4.2)}]}>
-              {props.type !== 'pickup' && props.type !== 'assigned_orders' && (
-                <Button
-                  onPressFunction={() => {
-                    navigate('DeliveryUpdate', {data: item});
-                  }}
-                  label="Deliver Now"
-                  buttonStyle={styles.whiteButton}
-                  buttonTextStyle={styles.whiteButtonText}
-                />
-              )}
+            <>
+              <View
+                style={[
+                  styles.rowContainer,
+                  {
+                    // marginBottom: SIZES.wp(8 / 4.2),
+                  },
+                ]}>
+                <TouchableOpacity style={styles.buttonContainer}>
+                  <Text style={styles.buttonText}>Delivered</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.buttonContainer, {borderColor: '#FF8A3C'}]}>
+                  <Text style={[styles.buttonText, {color: '#FF8A3C'}]}>
+                    {item.attempted_count} Attempted
+                  </Text>
+                </TouchableOpacity>
+              </View>
               <Button
-                onPressFunction={() => {
-                  navigate('MapScreen', {
-                    data: item,
-                  });
-                }}
+                onPressFunction={handleGoogleMapsNavigation}
                 label={
-                  props.type === 'pickup' ? 'Pickup the order' : 'Navigate Now'
+                  !item.is_pickup && item.status === 'pending'
+                    ? 'Navigate to  delivery location'
+                    : item.is_pickup &&
+                      item.status === 'pending' &&
+                      'Navigate to pickup location'
                 }
-                buttonStyle={[
-                  styles.buttonStyle,
-                  (props.type === 'pickup' ||
-                    props.type === 'assigned_orders') && {width: '100%'},
-                ]}
+                buttonStyle={[styles.buttonStyle, {width: '100%'}]}
               />
-            </View>
+            </>
           )}
         </Animated.View>
       </Animated.View>
@@ -223,7 +251,7 @@ const styles = StyleSheet.create({
   },
   buttonStyle: {
     width: '48%',
-    marginTop: SIZES.wp(24 / 4.2),
+    marginTop: SIZES.wp(8 / 4.2),
     borderWidth: 1,
     borderColor: COLORS.primary,
   },
@@ -236,5 +264,25 @@ const styles = StyleSheet.create({
   },
   whiteButtonText: {
     color: COLORS.primary,
+  },
+  rowContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  buttonContainer: {
+    width: '48%',
+    borderColor: '#003FF0',
+    borderWidth: SIZES.wp(1 / 4.2),
+    borderRadius: SIZES.wp(6 / 4.2),
+    paddingVertical: SIZES.wp(15 / 4.2),
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonText: {
+    ...FONTS.regular,
+    fontSize: SIZES.wp(14 / 4.2),
+    color: '#003FF0',
   },
 });
