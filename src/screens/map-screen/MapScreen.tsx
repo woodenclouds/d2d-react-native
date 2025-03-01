@@ -390,6 +390,7 @@ const MapScreen = (props: Props) => {
                   setVisible={setDetailsModal}
                   onPressFunction={handleGoogleMapsNavigation}
                   data={oderData}
+                  navigate={navigate}
                 />
               }
               isVisible={detailsModal}

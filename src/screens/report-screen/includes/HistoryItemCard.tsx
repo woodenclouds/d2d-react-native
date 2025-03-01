@@ -13,7 +13,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import DeliveryIcon from '@app/assets/icons/delivery_green_icon.svg';
-import DeliveredIcon from '@app/assets/icons/delivery_icon.svg';
+import DeliveredIcon from '@app/assets/icons/delivered_icon.svg';
 import PickupIcon from '@app/assets/icons/pickup_icon.svg';
 import AttemptIcon from '@app/assets/icons/attempt_icon.svg';
 import DownArrow from '@app/assets/icons/down_arrow.svg';
@@ -87,8 +87,8 @@ const HistoryItemCard = (props: Props) => {
           <Text style={styles.itemText} numberOfLines={1}>
             {item?.address}
           </Text>
-          {props.type !== 'history' &&
-            (!item.is_pickup ? (
+          {props.type !== 'history' ? (
+            !item.is_pickup ? (
               item.status === 'pending' && (
                 <Text style={styles.subText}>Delivered within 30 min</Text>
               )
@@ -98,7 +98,10 @@ const HistoryItemCard = (props: Props) => {
               <Text style={styles.subText}>
                 Attempted {item.attempted_count} time
               </Text>
-            ))}
+            )
+          ) : (
+            <Text style={styles.subText}>Delivered</Text>
+          )}
         </View>
         <Animated.View style={rotateArrowStyle}>
           <DownArrow />
@@ -146,14 +149,12 @@ const HistoryItemCard = (props: Props) => {
           {props.type !== 'history' && <View style={styles.lineView} />}
           {props.type !== 'history' && (
             <>
-              <View
-                style={[
-                  styles.rowContainer,
-                  {
-                    // marginBottom: SIZES.wp(8 / 4.2),
-                  },
-                ]}>
-                <TouchableOpacity style={styles.buttonContainer}>
+              <View style={[styles.rowContainer]}>
+                <TouchableOpacity
+                  style={styles.buttonContainer}
+                  onPress={() => {
+                    navigate('DeliveryUpdate', {data: item});
+                  }}>
                   <Text style={styles.buttonText}>Delivered</Text>
                 </TouchableOpacity>
                 <TouchableOpacity

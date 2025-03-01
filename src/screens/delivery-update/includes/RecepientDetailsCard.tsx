@@ -13,7 +13,16 @@ const RecepientDetailsCard = (props: Props) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.imageContainer}></View>
+      <View style={styles.imageContainer}>
+        <View style={[styles.rowViewSpace, {marginBottom: SIZES.wp(10 / 4.2)}]}>
+          <Text style={styles.labelText}>Order id</Text>
+          <Text style={styles.itemTextSmall}>#3498590</Text>
+        </View>
+        <View style={styles.rowViewSpace}>
+          <Text style={styles.labelText}>Order type</Text>
+          <Text style={styles.itemTextSmall}>{data?.order_type}</Text>
+        </View>
+      </View>
       <View style={styles.spacedRowContainer}>
         <View style={styles.rowContainer}>
           <ProfileIcon />
@@ -46,9 +55,10 @@ const styles = StyleSheet.create({
   imageContainer: {
     backgroundColor: '#e4e6e9',
     width: '100%',
-    height: SIZES.wp(120 / 4.2),
+    // height: SIZES.wp(120 / 4.2),
     borderRadius: SIZES.wp(6 / 4.2),
     marginBottom: SIZES.wp(20 / 4.2),
+    padding: SIZES.wp(20 / 4.2),
   },
   spacedRowContainer: {
     flexDirection: 'row',
@@ -69,5 +79,19 @@ const styles = StyleSheet.create({
     ...FONTS.regular,
     color: '#212529',
     fontSize: SIZES.wp(14 / 4.2),
+  },
+  rowViewSpace: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    // marginBottom: SIZES.wp(23 / 4.2),
+  },
+  itemTextSmall: {
+    ...FONTS.regular,
+    fontSize: SIZES.wp(13 / 4.2),
+    color: '#212529',
+    maxWidth: SIZES.wp(190 / 4.2),
+    textAlign: 'right',
   },
 });

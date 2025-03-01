@@ -105,7 +105,7 @@ export const assignedOrders = async () => {
     if (!token) throw new Error('User is not authenticated');
 
     const response = await api.get(
-      '/orders/delivery-agent/orders/?order_type=assigned',
+      '/orders/delivery-agent/orders/?order_type=assigned&is_delivered=false',
       {
         headers: {Authorization: `Bearer ${token}`},
       },
@@ -118,13 +118,13 @@ export const assignedOrders = async () => {
   }
 };
 
-export const unassignedOrders = async () => {
+export const pickupOrders = async () => {
   try {
     const token = await AsyncStorage.getItem('authToken');
     if (!token) throw new Error('User is not authenticated');
 
     const response = await api.get(
-      '/orders/delivery-agent/orders/?order_type=unassigned',
+      '/orders/delivery-agent/orders/?order_type=assigned&is_pickup=true',
       {
         headers: {Authorization: `Bearer ${token}`},
       },

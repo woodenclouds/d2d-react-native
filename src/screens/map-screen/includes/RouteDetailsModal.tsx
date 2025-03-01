@@ -15,10 +15,11 @@ type Props = {
   setVisible: (data: boolean) => void;
   onPressFunction?: () => void;
   data: any;
+  navigate: any;
 };
 
 const RouteDetailsModal = (props: Props) => {
-  const {setVisible, onPressFunction, data} = props;
+  const {setVisible, onPressFunction, data, navigate} = props;
 
   console.log(data, 'data=======');
 
@@ -36,9 +37,9 @@ const RouteDetailsModal = (props: Props) => {
       </View>
       <View style={styles.DashLine}></View>
       <View style={styles.greyContainer}>
-        <View style={styles.rowContainer}>
+        <View style={[styles.rowContainer, {marginBottom: SIZES.wp(10 / 4.2)}]}>
           <Text style={styles.detailsLabel}>Order id</Text>
-          <Text style={styles.detailsText}>{data?.order_id}</Text>
+          <Text style={styles.detailsText}>#f098098</Text>
         </View>
         <View style={styles.rowContainer}>
           <Text style={styles.detailsLabel}>Order type</Text>
@@ -83,11 +84,19 @@ const RouteDetailsModal = (props: Props) => {
             marginBottom: SIZES.wp(8 / 4.2),
           },
         ]}>
-        <TouchableOpacity style={styles.buttonContainer}>
-          <Text style={styles.buttonText}>Deliver</Text>
+        <TouchableOpacity
+          style={styles.buttonContainer}
+          onPress={() => {
+            navigate('DeliveryUpdate', {data: data});
+            setVisible(false);
+          }}>
+          <Text style={styles.buttonText}>Delivered</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.buttonContainer}>
-          <Text style={styles.buttonText}>0 Attempted</Text>
+        <TouchableOpacity
+          style={[styles.buttonContainer, {borderColor: '#FF8A3C'}]}>
+          <Text style={[styles.buttonText, {color: '#FF8A3C'}]}>
+            {data.attempted_count} Attempted
+          </Text>
         </TouchableOpacity>
       </View>
       <Button

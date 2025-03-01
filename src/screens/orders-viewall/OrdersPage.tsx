@@ -1,12 +1,13 @@
 import {
   ActivityIndicator,
+  Dimensions,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import SafeAreaWrapper from '@app/components/SafeAreaWrapper';
 import CommonHeader from '@app/components/CommonHeader';
 import {navigateBack} from '@app/services/navigationService';
@@ -17,18 +18,24 @@ import BottomModal from '@app/components/BottomModal';
 import FilterModal from './inludes/FilterModal';
 import {
   assignedOrders,
-  unassignedOrders,
+  pickupOrders,
   filteredOrder,
+  orderHistory,
 } from '@app/services/api';
 import CenterModalBox from '@app/components/CenterModalBox';
 import {useAuth} from '../../context/AuthContext';
 import OrderDetailsUpdateModal from '../map-screen/includes/OrderDetailsUpdateModal';
+
+const {width: screenWidth} = Dimensions.get('window');
 
 type Props = {};
 
 const OrdersPage = (props: Props) => {
   const {state, resetOrderDetailsUpdated} = useAuth();
   const [activeTab, setActiveTab] = useState(0);
+  const contentScrollRef = useRef<ScrollView>(null);
+  const tabs = ['Pending', 'Picked', 'Attempted', 'Delivered'];
+
   const [modalVisible, setModalVisible] = useState(false);
 
   const [orders, setOrders] = useState([]);
@@ -39,15 +46,34 @@ const OrdersPage = (props: Props) => {
   const [openToPickLoading, setOpenToPickLoading] = useState(true);
   const [openToPickError, setOpenToPickError] = useState(null);
 
+  const [deliveredOrders, setDeliveredOrders] = useState([]);
+  const [deliveredLoading, setDeliveredLoading] = useState(true);
+  const [deliveredError, setDeliveredError] = useState(null);
+
   useEffect(() => {
     fetchOrders();
-    fetchUnassignedOrders();
+    fetchPickupOrders();
+    fetchDeliveredOrders();
   }, []);
+
+  const handleTabPress = (index: number) => {
+    setActiveTab(index);
+    contentScrollRef.current?.scrollTo({
+      x: screenWidth * index,
+      animated: true,
+    });
+  };
+
+  const handleContentScroll = (event: any) => {
+    const offsetX = event.nativeEvent.contentOffset.x;
+    const index = Math.round(offsetX / screenWidth);
+    setActiveTab(index);
+  };
 
   const fetchOrders = async () => {
     try {
       const data = await assignedOrders(); // Call API
-      setOrders(data); // Store data in state
+      setOrders(data.data); // Store data in state
     } catch (err) {
       setError('Failed to load orders');
     } finally {
@@ -59,14 +85,25 @@ const OrdersPage = (props: Props) => {
     resetOrderDetailsUpdated();
   };
 
-  const fetchUnassignedOrders = async () => {
+  const fetchPickupOrders = async () => {
     try {
-      const data = await unassignedOrders(); // Call API
-      setOpenToPickOrders(data); // Store data in state
+      const data = await pickupOrders(); // Call API
+      setOpenToPickOrders(data.data); // Store data in state
     } catch (err) {
       setOpenToPickError('Failed to load orders');
     } finally {
       setOpenToPickLoading(false);
+    }
+  };
+
+  const fetchDeliveredOrders = async () => {
+    try {
+      const data = await orderHistory(); // Call API
+      setDeliveredOrders(data.data); // Store data in state
+    } catch (err) {
+      setDeliveredError('Failed to load orders');
+    } finally {
+      setDeliveredLoading(false);
     }
   };
 
@@ -111,64 +148,96 @@ const OrdersPage = (props: Props) => {
       />
       <View style={styles.container}>
         <View style={styles.mainContainer}>
-          <View style={styles.rowView}>
-            <TouchableOpacity
-              style={[
-                styles.tabButton,
-                {borderBottomColor: activeTab === 0 ? '#4A4D4E' : '#ABABAB'},
-              ]}
-              onPress={() => setActiveTab(0)}>
-              <Text
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.tabsContainer}>
+            {tabs.map((tab, index) => (
+              <TouchableOpacity
+                key={tab}
+                onPress={() => handleTabPress(index)}
                 style={[
-                  styles.tabButtonText,
-                  {color: activeTab === 0 ? '#4A4D4E' : '#ABABAB'},
+                  styles.tabButton,
+                  activeTab === index && styles.activeTab,
                 ]}>
-                Assigned
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.tabButton,
-                {borderBottomColor: activeTab === 1 ? '#4A4D4E' : '#ABABAB'},
-              ]}
-              onPress={() => setActiveTab(1)}>
-              <Text
-                style={[
-                  styles.tabButtonText,
-                  {color: activeTab === 1 ? '#4A4D4E' : '#ABABAB'},
-                ]}>
-                Open to pick
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <ScrollView style={styles.scrollContainer}>
-            {activeTab === 0 ? (
-              loading ? (
-                <ActivityIndicator size="large" color="#4A4D4E" />
-              ) : error ? (
-                <Text style={styles.errorText}>{error}</Text>
-              ) : orders?.data?.length > 0 ? (
-                orders?.data?.map((item, index) => (
-                  <HistoryItemCard item={item} key={index} />
-                ))
-              ) : (
-                <Text style={styles.errorText}>
-                  No assigned orders available
+                <Text
+                  style={[
+                    styles.tabText,
+                    activeTab === index && styles.activeTabText,
+                  ]}>
+                  {tab}
                 </Text>
-              )
-            ) : openToPickLoading ? (
-              <ActivityIndicator size="large" color="#4A4D4E" />
-            ) : openToPickError ? (
-              <Text style={styles.errorText}>{openToPickError}</Text>
-            ) : openToPickOrders?.data?.length > 0 ? (
-              openToPickOrders?.data?.map((item, index) => (
-                <HistoryItemCard item={item} key={index} type={'pickup'} />
-              ))
-            ) : (
-              <Text style={styles.errorText}>
-                No open-to-pick orders available
-              </Text>
-            )}
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+          <ScrollView
+            style={styles.scrollContainer}
+            ref={contentScrollRef}
+            pagingEnabled
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            onMomentumScrollEnd={handleContentScroll}>
+            {tabs.map((tab, index) => (
+              <View key={tab} style={{width: screenWidth}}>
+                <ScrollView contentContainerStyle={styles.contentContainer}>
+                  {index === 0 && // Pending tab
+                    (loading ? (
+                      <ActivityIndicator size="large" color="#4A4D4E" />
+                    ) : error ? (
+                      <Text style={styles.errorText}>{error}</Text>
+                    ) : orders.length > 0 ? (
+                      orders.map((item, idx) => (
+                        <HistoryItemCard key={idx} item={item} />
+                      ))
+                    ) : (
+                      <Text style={styles.errorText}>
+                        No assigned orders available
+                      </Text>
+                    ))}
+                  {index === 1 && // Picked tab
+                    (openToPickLoading ? (
+                      <ActivityIndicator size="large" color="#4A4D4E" />
+                    ) : openToPickError ? (
+                      <Text style={styles.errorText}>{openToPickError}</Text>
+                    ) : openToPickOrders.length > 0 ? (
+                      openToPickOrders.map((item, idx) => (
+                        <HistoryItemCard
+                          key={idx}
+                          item={item}
+                          type={'pickup'}
+                        />
+                      ))
+                    ) : (
+                      <Text style={styles.errorText}>
+                        No open-to-pick orders available
+                      </Text>
+                    ))}
+                  {index === 2 && ( // Attempted tab
+                    <View>
+                      <Text>Attempted Content Placeholder</Text>
+                    </View>
+                  )}
+                  {index === 3 && // Delivered tab
+                    (deliveredLoading ? (
+                      <ActivityIndicator size="large" color="#4A4D4E" />
+                    ) : deliveredError ? (
+                      <Text style={styles.errorText}>{deliveredError}</Text>
+                    ) : deliveredOrders.length > 0 ? (
+                      deliveredOrders.map((item, idx) => (
+                        <HistoryItemCard
+                          key={idx}
+                          item={item}
+                          type={'history'}
+                        />
+                      ))
+                    ) : (
+                      <Text style={styles.errorText}>
+                        No delivered orders available
+                      </Text>
+                    ))}
+                </ScrollView>
+              </View>
+            ))}
           </ScrollView>
         </View>
       </View>
@@ -206,7 +275,7 @@ export default OrdersPage;
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    paddingHorizontal: SIZES.wp(20 / 4.2),
+    // paddingHorizontal: SIZES.wp(20 / 4.2),
     marginTop: SIZES.wp(16 / 4.2),
   },
   mainContainer: {
@@ -220,12 +289,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   tabButton: {
-    width: '50%',
+    width: SIZES.wp(160 / 4.2),
     alignItems: 'center',
     justifyContent: 'center',
     padding: SIZES.wp(8 / 4.2),
     borderBottomWidth: SIZES.wp(1 / 4.2),
-    borderBottomColor: '#666666',
+    borderBottomColor: '#ABABAB',
   },
   tabButtonText: {
     ...FONTS.medium,
@@ -234,6 +303,34 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   scrollContainer: {
-    marginTop: SIZES.wp(16 / 4.2),
+    minHeight: SIZES.hp('90%'),
+    // marginTop: SIZES.wp(16 / 4.2),
+    // paddingHorizontal: SIZES.wp(20 / 4.2),
+  },
+  tabsContainer: {
+    // paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#FFFFFF',
+  },
+  contentContainer: {
+    paddingHorizontal: SIZES.wp(20 / 4.2),
+    paddingTop: SIZES.wp(16 / 4.2),
+    // backgroundColor: '#fff',
+  },
+  activeTab: {
+    borderColor: '#666666',
+  },
+  tabText: {
+    ...FONTS.medium,
+    fontSize: SIZES.wp(14 / 4.2),
+    color: '#ABABAB',
+    textAlign: 'center',
+  },
+  activeTabText: {
+    color: '#666666',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 16,
   },
 });
