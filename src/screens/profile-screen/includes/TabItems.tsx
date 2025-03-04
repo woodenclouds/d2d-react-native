@@ -66,10 +66,12 @@ const TabItems = (props: Props) => {
               ))
             : attendances.map((item, index) => (
                 <ItemCard
+                  key={index}
                   label={item?.date}
                   attendance={true}
                   valueText={item?.status}
                   color={item?.status === 'present' ? '#24AC33' : '#CE0003'}
+                  loginLogout={item?.chekin_nd_chekout_time}
                 />
               ))}
         </ScrollView>
@@ -112,5 +114,6 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     marginTop: SIZES.wp(16 / 4.2),
+    height: SIZES.wp(400 / 4.2),
   },
 });

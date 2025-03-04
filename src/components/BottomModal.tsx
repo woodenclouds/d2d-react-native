@@ -1,5 +1,5 @@
-import {Pressable, StyleSheet, Text, View} from 'react-native';
-import React from 'react';
+import {Pressable, StyleSheet, View, BackHandler, Platform} from 'react-native';
+import React, {useEffect, useCallback} from 'react';
 import Modal from 'react-native-modal';
 import {SIZES} from '@app/themes/themes';
 
@@ -7,18 +7,47 @@ type Props = {
   children: React.ReactNode;
   isVisible: boolean;
   setVisible: (data: boolean) => void;
+  defaultClose?: boolean;
 };
 
 const BottomModal = (props: Props) => {
-  const {children, isVisible, setVisible} = props;
+  const {children, isVisible, setVisible, defaultClose = true} = props;
+
+  const handleBackPress = useCallback(() => {
+    if (isVisible && !defaultClose) {
+      console.log('Exiting app due to defaultClose=false');
+      if (Platform.OS === 'android') {
+        BackHandler.exitApp();
+      } else {
+        setVisible(false);
+      }
+      return true;
+    }
+    return false;
+  }, [isVisible, defaultClose, setVisible]);
+
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      handleBackPress,
+    );
+
+    return () => backHandler.remove();
+  }, [handleBackPress]);
 
   return (
     <Modal
       onBackButtonPress={() => {
-        setVisible(false);
+        if (defaultClose) {
+          setVisible(false);
+        } else {
+          handleBackPress();
+        }
       }}
       onBackdropPress={() => {
-        setVisible(false);
+        if (defaultClose) {
+          setVisible(false);
+        }
       }}
       isVisible={isVisible}
       backdropOpacity={0.1}
@@ -28,8 +57,8 @@ const BottomModal = (props: Props) => {
       }}
       propagateSwipe={true}
       useNativeDriver={false}
-      onSwipeComplete={() => setVisible(false)}
-      swipeDirection={['down']}>
+      onSwipeComplete={() => defaultClose && setVisible(false)}
+      swipeDirection={defaultClose ? ['down'] : []}>
       <View style={styles.modalContainer}>{children}</View>
     </Modal>
   );

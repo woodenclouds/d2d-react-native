@@ -10,7 +10,7 @@ import {
 import React, {useState, useEffect, useRef} from 'react';
 import SafeAreaWrapper from '@app/components/SafeAreaWrapper';
 import CommonHeader from '@app/components/CommonHeader';
-import {navigateBack} from '@app/services/navigationService';
+import {navigate, navigateBack} from '@app/services/navigationService';
 import FilterIcon from '@app/assets/icons/filter_icon.svg';
 import {FONTS, SIZES} from '@app/themes/themes';
 import HistoryItemCard from '../report-screen/includes/HistoryItemCard';
@@ -21,10 +21,12 @@ import {
   pickupOrders,
   filteredOrder,
   orderHistory,
+  attemptedOrders,
 } from '@app/services/api';
 import CenterModalBox from '@app/components/CenterModalBox';
 import {useAuth} from '../../context/AuthContext';
 import OrderDetailsUpdateModal from '../map-screen/includes/OrderDetailsUpdateModal';
+import AttemptedModal from './inludes/AttemptedModal';
 
 const {width: screenWidth} = Dimensions.get('window');
 
@@ -35,8 +37,10 @@ const OrdersPage = (props: Props) => {
   const [activeTab, setActiveTab] = useState(0);
   const contentScrollRef = useRef<ScrollView>(null);
   const tabs = ['Pending', 'Picked', 'Attempted', 'Delivered'];
+  const [selectItem, setSelectItem] = useState({});
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [attemptedModalVisible, setAttemptedModalVisible] = useState(false);
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -50,10 +54,15 @@ const OrdersPage = (props: Props) => {
   const [deliveredLoading, setDeliveredLoading] = useState(true);
   const [deliveredError, setDeliveredError] = useState(null);
 
+  const [attemptedOrder, setAttemptedOrder] = useState([]);
+  const [attemptedLoading, setAttemptedLoading] = useState(true);
+  const [attemptedError, setAttemptedError] = useState(null);
+
   useEffect(() => {
     fetchOrders();
     fetchPickupOrders();
     fetchDeliveredOrders();
+    fetchAttemptedOrders();
   }, []);
 
   const handleTabPress = (index: number) => {
@@ -81,6 +90,10 @@ const OrdersPage = (props: Props) => {
     }
   };
 
+  const handleAttemptedModal = () => {
+    setAttemptedModalVisible(true);
+  };
+
   const handleDeliverySuccessModal = () => {
     resetOrderDetailsUpdated();
   };
@@ -104,6 +117,17 @@ const OrdersPage = (props: Props) => {
       setDeliveredError('Failed to load orders');
     } finally {
       setDeliveredLoading(false);
+    }
+  };
+
+  const fetchAttemptedOrders = async () => {
+    try {
+      const data = await attemptedOrders(); // Call API
+      setAttemptedOrder(data.data); // Store data in state
+    } catch (err) {
+      setAttemptedError('Failed to load orders');
+    } finally {
+      setAttemptedLoading(false);
     }
   };
 
@@ -133,6 +157,61 @@ const OrdersPage = (props: Props) => {
         console.log(err);
       });
   };
+
+  const handleAttemptPress = () => {
+    navigate('DeliveryUpdate', {data: selectItem, type: 'attempted'});
+    setAttemptedModalVisible(false);
+  };
+
+  const filterData = () => {
+    // Guard against undefined arrays
+    const targetArray =
+      activeTab === 0
+        ? orders
+        : activeTab === 1
+        ? openToPickOrders
+        : attemptedOrder;
+
+    if (!targetArray) return;
+
+    if (state.tempItem.itemType === 'attempted') {
+      const updatedArray = targetArray.map((item: any) =>
+        item.id === state.tempItem.itemId
+          ? {...item, attempted_count: (item.attempted_count || 0) + 1}
+          : item,
+      );
+      // Update the corresponding state based on activeTab
+      activeTab === 0
+        ? setOrders(updatedArray)
+        : activeTab === 1
+        ? setOpenToPickOrders(updatedArray)
+        : setAttemptedOrder(updatedArray);
+    } else {
+      if (state.tempItem.itemStatus === 'delivery') {
+        const filteredArray = targetArray.filter(
+          (item: any) => item.id !== state.tempItem.itemId,
+        );
+        // Update the corresponding state based on activeTab
+        activeTab === 0
+          ? setOrders(filteredArray)
+          : activeTab === 1
+          ? setOpenToPickOrders(filteredArray)
+          : setAttemptedOrder(filteredArray);
+      } else {
+        return;
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (
+      orders.length > 0 ||
+      openToPickOrders.length > 0 ||
+      attemptedOrder.length > 0
+    ) {
+      filterData();
+    }
+  }, [state.tempItem]);
 
   return (
     <SafeAreaWrapper backgroundColor="#F5F7FA" barStyle="dark-content">
@@ -165,7 +244,15 @@ const OrdersPage = (props: Props) => {
                     styles.tabText,
                     activeTab === index && styles.activeTabText,
                   ]}>
-                  {tab}
+                  {tab} (
+                  {index === 0
+                    ? orders.length
+                    : index === 1
+                    ? openToPickOrders.length
+                    : index === 2
+                    ? attemptedOrder.length
+                    : deliveredOrders.length}
+                  )
                 </Text>
               </TouchableOpacity>
             ))}
@@ -187,7 +274,14 @@ const OrdersPage = (props: Props) => {
                       <Text style={styles.errorText}>{error}</Text>
                     ) : orders.length > 0 ? (
                       orders.map((item, idx) => (
-                        <HistoryItemCard key={idx} item={item} />
+                        <HistoryItemCard
+                          key={idx}
+                          item={item}
+                          onAttemptPress={() => {
+                            handleAttemptedModal();
+                            setSelectItem(item);
+                          }}
+                        />
                       ))
                     ) : (
                       <Text style={styles.errorText}>
@@ -205,6 +299,10 @@ const OrdersPage = (props: Props) => {
                           key={idx}
                           item={item}
                           type={'pickup'}
+                          onAttemptPress={() => {
+                            handleAttemptedModal();
+                            setSelectItem(item);
+                          }}
                         />
                       ))
                     ) : (
@@ -212,11 +310,28 @@ const OrdersPage = (props: Props) => {
                         No open-to-pick orders available
                       </Text>
                     ))}
-                  {index === 2 && ( // Attempted tab
-                    <View>
-                      <Text>Attempted Content Placeholder</Text>
-                    </View>
-                  )}
+                  {index === 2 && // Attempted tab
+                    (attemptedLoading ? (
+                      <ActivityIndicator size="large" color="#4A4D4E" />
+                    ) : attemptedError ? (
+                      <Text style={styles.errorText}>{attemptedError}</Text>
+                    ) : attemptedOrder.length > 0 ? (
+                      attemptedOrder.map((item, idx) => (
+                        <HistoryItemCard
+                          key={idx}
+                          item={item}
+                          onAttemptPress={() => {
+                            handleAttemptedModal();
+                            setSelectItem(item);
+                          }}
+                          // type={'history'}
+                        />
+                      ))
+                    ) : (
+                      <Text style={styles.errorText}>
+                        No attempted orders available
+                      </Text>
+                    ))}
                   {index === 3 && // Delivered tab
                     (deliveredLoading ? (
                       <ActivityIndicator size="large" color="#4A4D4E" />
@@ -255,6 +370,19 @@ const OrdersPage = (props: Props) => {
           setVisible={setModalVisible}
         />
         <CenterModalBox
+          isVisible={attemptedModalVisible}
+          backdropOpacity={0.3}
+          onBackButtonPress={() => setAttemptedModalVisible(false)}
+          onBackdropPress={() => setAttemptedModalVisible(false)}
+          children={
+            <AttemptedModal
+              onPress={handleAttemptPress}
+              setModalVisible={setAttemptedModalVisible}
+              item={selectItem}
+            />
+          }
+        />
+        <CenterModalBox
           isVisible={state.orderDetailsUpdated}
           backdropOpacity={0.3}
           onBackButtonPress={handleDeliverySuccessModal}
@@ -276,7 +404,7 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     // paddingHorizontal: SIZES.wp(20 / 4.2),
-    marginTop: SIZES.wp(16 / 4.2),
+    // marginTop: SIZES.wp(16 / 4.2),
   },
   mainContainer: {
     // backgroundColor: '#fff',
@@ -303,14 +431,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   scrollContainer: {
-    minHeight: SIZES.hp('90%'),
+    height: SIZES.hp('90%'),
     // marginTop: SIZES.wp(16 / 4.2),
     // paddingHorizontal: SIZES.wp(20 / 4.2),
   },
   tabsContainer: {
     // paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#FFFFFF',
+    // backgroundColor: '#FFFFFF',
   },
   contentContainer: {
     paddingHorizontal: SIZES.wp(20 / 4.2),

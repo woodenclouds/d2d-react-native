@@ -26,6 +26,7 @@ type Props = {
   setNotes: (text: string) => void; // Function to update notes
   setIsBulkOrder: (value: boolean) => void;
   isBulkOrder: boolean;
+  order_status?: string;
 };
 
 const DeliveryDetailsCard = (props: Props) => {
@@ -41,13 +42,14 @@ const DeliveryDetailsCard = (props: Props) => {
     setNotes,
     isBulkOrder,
     setIsBulkOrder,
+    order_status,
   } = props;
 
   return (
     <View style={styles.container}>
       <Text style={styles.headingText}>Delivery Details</Text>
       <View style={styles.boxContainer}>
-        <View>
+        {/* <View>
           <Text style={styles.labelText}>Status</Text>
           <View style={styles.radioConainerStyle}>
             {statusData.map((item, index) => (
@@ -64,34 +66,36 @@ const DeliveryDetailsCard = (props: Props) => {
               />
             ))}
           </View>
-        </View>
-        {deliveryStatus === 'Delivered' && (
-          <View style={styles.buttonContainer}>
-            <Text style={styles.labelText}>Signature</Text>
-            {signature ? (
-              <TouchableOpacity
-                style={styles.signatureContainer}
-                onPress={() => {
-                  // Optionally navigate to view or edit signature
-                }}>
-                <Image
-                  source={{uri: `${signature}`}}
-                  style={styles.signatureImage}
-                  resizeMode="contain"
+        </View> */}
+        {order_status !== 'pickup' &&
+          order_status !== 'attempted' &&
+          deliveryStatus === 'Delivered' && (
+            <View style={styles.buttonContainer}>
+              <Text style={styles.labelText}>Signature</Text>
+              {signature ? (
+                <TouchableOpacity
+                  style={styles.signatureContainer}
+                  onPress={() => {
+                    // Optionally navigate to view or edit signature
+                  }}>
+                  <Image
+                    source={{uri: `${signature}`}}
+                    style={styles.signatureImage}
+                    resizeMode="contain"
+                  />
+                </TouchableOpacity>
+              ) : (
+                <CommonDashedButton
+                  label={'Add Signature'}
+                  onPressFunction={() => {
+                    navigate('SignatureScreens', {});
+                  }}
                 />
-              </TouchableOpacity>
-            ) : (
-              <CommonDashedButton
-                label={'Add Signature'}
-                onPressFunction={() => {
-                  navigate('SignatureScreens', {});
-                }}
-              />
-            )}
-          </View>
-        )}
+              )}
+            </View>
+          )}
 
-        {deliveryStatus === 'Delivered' && (
+        {order_status !== 'pickup' && deliveryStatus === 'Delivered' && (
           <View style={styles.buttonContainer}>
             <Text style={styles.labelText}>Image</Text>
             {images.length > 0 ? (
@@ -136,27 +140,29 @@ const DeliveryDetailsCard = (props: Props) => {
             numberOfLines={4}
           />
         </View>
-        <TouchableOpacity
-          style={styles.checkBoxContainer}
-          activeOpacity={0.6}
-          onPress={() => setIsBulkOrder(!isBulkOrder)}>
-          <View
-            style={[
-              styles.checkBoxStyle,
-              isBulkOrder && {
-                backgroundColor: '#0144FF',
-                borderColor: '#0144FF',
-              },
-            ]}>
+        {order_status !== 'pickup' && order_status !== 'attempted' && (
+          <TouchableOpacity
+            style={styles.checkBoxContainer}
+            activeOpacity={0.6}
+            onPress={() => setIsBulkOrder(!isBulkOrder)}>
             <View
-              style={{width: SIZES.wp(12 / 4.2), height: SIZES.wp(12 / 4.2)}}>
-              <WhiteTick />
+              style={[
+                styles.checkBoxStyle,
+                isBulkOrder && {
+                  backgroundColor: '#0144FF',
+                  borderColor: '#0144FF',
+                },
+              ]}>
+              <View
+                style={{width: SIZES.wp(12 / 4.2), height: SIZES.wp(12 / 4.2)}}>
+                <WhiteTick />
+              </View>
             </View>
-          </View>
-          <Text style={styles.checkBoxText}>
-            Bulk order (large / heavy orders)
-          </Text>
-        </TouchableOpacity>
+            <Text style={styles.checkBoxText}>
+              Bulk order (large / heavy orders)
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

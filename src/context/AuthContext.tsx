@@ -16,6 +16,11 @@ interface AuthState {
   checkInId: string | null;
   signature: string | null;
   orderDetailsUpdated: boolean;
+  tempItem: {
+    itemId: string | null;
+    itemType: string | null;
+    itemStatus: string | null;
+  };
 }
 
 // Define Action Types
@@ -36,7 +41,15 @@ type AuthAction =
   | {type: 'SET_SIGNATURE'; payload: string} // Add action for setting signature
   | {type: 'CLEAR_SIGNATURE'} // Add action for clearing signature
   | {type: 'SET_ORDER_DETAILS_UPDATED'; payload: boolean} // Action for setting order details updated
-  | {type: 'RESET_ORDER_DETAILS_UPDATED'};
+  | {type: 'RESET_ORDER_DETAILS_UPDATED'}
+  | {
+      type: 'UPDATE_TEMP_ITEM';
+      payload: {
+        itemId: string | null;
+        itemType: string | null;
+        itemStatus: string | null;
+      };
+    };
 
 // Initial State
 const initialState: AuthState = {
@@ -51,6 +64,11 @@ const initialState: AuthState = {
   checkInId: null,
   signature: null,
   orderDetailsUpdated: false,
+  tempItem: {
+    itemId: null,
+    itemType: null,
+    itemStatus: null,
+  },
 };
 
 // Reducer Function
@@ -81,6 +99,8 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
       return {...state, orderDetailsUpdated: action.payload}; // Set order details updated
     case 'RESET_ORDER_DETAILS_UPDATED':
       return {...state, orderDetailsUpdated: false};
+    case 'UPDATE_TEMP_ITEM':
+      return {...state, tempItem: action.payload};
     default:
       return state;
   }
@@ -97,6 +117,11 @@ interface AuthContextType {
   clearSignature: () => void; // Add method to clear
   setOrderDetailsUpdated: (updated: boolean) => void; // Method to set order details updated
   resetOrderDetailsUpdated: () => void; // Method to reset order details updated
+  updateTempItem: (
+    itemId: string | null,
+    itemType: string | null,
+    itemStatus: string | null,
+  ) => void;
 }
 
 // Create Context
@@ -149,28 +174,21 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
   // Login Function
   const login = async (email: string, password: string) => {
     try {
-      const {access, refresh, userId, role, name} = await loginUser(
-        email,
-        password,
-      ); // Call API
-
-      // Store in AsyncStorage
-      await AsyncStorage.setItem('authToken', access);
-      await AsyncStorage.setItem('refreshToken', refresh);
-      await AsyncStorage.setItem('userId', userId.toString());
-      await AsyncStorage.setItem('userRole', role);
-      await AsyncStorage.setItem('userName', name);
-
-      // Set global auth headers
-      axios.defaults.headers.common['Authorization'] = `Bearer ${access}`;
-
-      // Dispatch login action
+      const result = await loginUser(email, password);
       dispatch({
         type: 'LOGIN_SUCCESS',
-        payload: {authToken: access, refreshToken: refresh, userId, role, name},
+        payload: {
+          authToken: result.access,
+          refreshToken: result.refresh,
+          userId: result.userId,
+          role: result.role,
+          name: result.name,
+        },
       });
+      return result; // Return the result to allow further validation
     } catch (error) {
-      dispatch({type: 'SET_ERROR', payload: (error as Error).message});
+      console.error('AuthContext Login Error:', error.message);
+      throw error; // Propagate the error to handleLogin
     }
   };
 
@@ -238,6 +256,18 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     dispatch({type: 'RESET_ORDER_DETAILS_UPDATED'});
   };
 
+  // Method to update temp item
+  const updateTempItem = (
+    itemId: string | null,
+    itemType: string | null,
+    itemStatus: string | null,
+  ) => {
+    dispatch({
+      type: 'UPDATE_TEMP_ITEM',
+      payload: {itemId, itemType, itemStatus},
+    });
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -250,6 +280,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         clearSignature,
         setOrderDetailsUpdated,
         resetOrderDetailsUpdated,
+        updateTempItem,
       }}>
       {children}
     </AuthContext.Provider>

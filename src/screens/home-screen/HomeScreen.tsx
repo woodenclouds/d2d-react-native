@@ -6,10 +6,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 
 import SafeAreaWrapper from '@app/components/SafeAreaWrapper';
-import { COLORS, SIZES, FONTS } from '@app/themes/themes';
+import {COLORS, SIZES, FONTS} from '@app/themes/themes';
 
 import SpotLight from './includes/SpotLight';
 import OrdersList from './includes/OrdersList';
@@ -17,18 +17,19 @@ import SigninButton from './includes/SigninButton';
 import CenterModalBox from '@app/components/CenterModalBox';
 import PunchOutModal from './includes/PunchOutModal';
 
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { navigate } from '@app/services/navigationService';
-import { useToast } from 'react-native-toast-notifications';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {navigate} from '@app/services/navigationService';
+import {useToast} from 'react-native-toast-notifications';
 
 import AppLogo from '@app/assets/icons/app_logo.svg';
 import BellIcon from '@app/assets/icons/bell_icon.svg';
 import TickWithSparkle from '@app/assets/icons/tick_with_sparkle.svg';
 import CardBoard from '@app/assets/icons/card_board.svg';
-import ArrowRight from '@app/assets/icons/arrow_right.svg'
+import ArrowRight from '@app/assets/icons/arrow_right.svg';
 
-import { useAuth } from '../../context/AuthContext';
-import { assignedOrders, orderReports } from '@app/services/api';
+import {useAuth} from '../../context/AuthContext';
+import {assignedOrders, orderReports} from '@app/services/api';
+import OrderDetailsUpdateModal from '../map-screen/includes/OrderDetailsUpdateModal';
 
 type Props = {};
 
@@ -36,8 +37,10 @@ const HomeScreen = (props: Props) => {
   const toast = useToast();
   const [signIn, setSignIn] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const { checkIn, checkOut, state } = useAuth();
-  const { checkInId } = state;
+  const {checkIn, checkOut, state, resetOrderDetailsUpdated} = useAuth();
+  const {checkInId, tempItem} = state;
+
+  console.log(tempItem);
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -46,6 +49,10 @@ const HomeScreen = (props: Props) => {
   const [reports, setReports] = useState([]);
   const [orderReportLoading, setOrderReportLoading] = useState(true);
   const [orderReportError, setOrderReportError] = useState(null);
+
+  const handleDeliverySuccessModal = () => {
+    resetOrderDetailsUpdated();
+  };
 
   const CustomToast = () => {
     return (
@@ -60,7 +67,7 @@ const HomeScreen = (props: Props) => {
 
   const showToast = () => {
     toast.show('', {
-      data: { renderToast: () => CustomToast() },
+      data: {renderToast: () => CustomToast()},
     });
   };
 
@@ -93,11 +100,11 @@ const HomeScreen = (props: Props) => {
   const fetchOrders = async () => {
     try {
       const data = await assignedOrders(); // Call API
-      console.log(data, 'data');
-
-      setOrders(data); // Store data in state
+      setOrders(data.data); // Store data in state
+      setLoading(false);
     } catch (err) {
       setError('Failed to load orders');
+      setLoading(false);
     } finally {
       setLoading(false);
     }
@@ -118,6 +125,33 @@ const HomeScreen = (props: Props) => {
     fetchOrders();
     fetchOrderReports();
   }, []);
+
+  const filterData = () => {
+    if (!orders) return; // Guard against undefined (though initialized as [])
+
+    if (tempItem.itemType === 'attempted') {
+      const updatedOrders = orders.map((item: any) =>
+        item.id === tempItem.itemId
+          ? {...item, attempted_count: (item.attempted_count || 0) + 1}
+          : item,
+      );
+
+      setOrders(updatedOrders);
+    } else {
+      if (tempItem.itemStatus === 'delivery') {
+        const data = orders.filter((item: any) => item.id !== tempItem.itemId);
+        setOrders(data);
+      } else {
+        return;
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (orders.length > 0) {
+      filterData();
+    }
+  }, [tempItem]);
 
   return (
     <>
@@ -140,6 +174,16 @@ const HomeScreen = (props: Props) => {
                 />
               }
             />
+            <CenterModalBox
+              isVisible={state.orderDetailsUpdated}
+              onBackButtonPress={handleDeliverySuccessModal}
+              onBackdropPress={handleDeliverySuccessModal}
+              children={
+                <OrderDetailsUpdateModal
+                  onPressFunction={handleDeliverySuccessModal}
+                />
+              }
+            />
             <View style={styles.topContainer}>
               <View style={styles.logoHeader}>
                 <View style={styles.rowView}>
@@ -155,7 +199,7 @@ const HomeScreen = (props: Props) => {
                   <BellIcon />
                 </TouchableOpacity>
               </View>
-              <SpotLight data={reports} />
+              <SpotLight data={reports} name={state?.name || ''} />
             </View>
             <SigninButton
               // onSwipeComplete={handleCheckIn}
@@ -173,8 +217,8 @@ const HomeScreen = (props: Props) => {
               <CardBoard />
               <Text style={styles.pharmacyText}>Pharmacy wise orders</Text>
               <View style={styles.arrowContainer}>
-                <ArrowRight 
-                  width={SIZES.wp(18 / 4.2)} 
+                <ArrowRight
+                  width={SIZES.wp(18 / 4.2)}
                   height={SIZES.wp(18 / 4.2)}
                 />
               </View>
@@ -187,7 +231,7 @@ const HomeScreen = (props: Props) => {
             ) : orders.length === 0 ? (
               <Text style={styles.noOrders}>No assigned orders</Text>
             ) : (
-              <OrdersList data={orders.data} />
+              <OrdersList data={orders} />
             )}
           </ScrollView>
         </GestureHandlerRootView>
@@ -263,18 +307,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     flexDirection: 'row',
-    gap: 4, 
+    gap: 4,
   },
   pharmacyText: {
     ...FONTS.regular,
     fontSize: SIZES.wp(14 / 4.2),
     lineHeight: 17,
-    color: "#0A0A0A",
+    color: '#0A0A0A',
     flex: 1,
   },
   arrowContainer: {
-    backgroundColor: "#EEF0F1",
+    backgroundColor: '#EEF0F1',
     padding: SIZES.wp(12 / 4.2),
-    borderRadius: SIZES.wp(20 / 4.2)
-  }
+    borderRadius: SIZES.wp(20 / 4.2),
+  },
 });

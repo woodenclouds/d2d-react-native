@@ -75,9 +75,6 @@ const MapScreen = (props: Props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [showRoute, setShowRoute] = useState(false);
   const {state, resetOrderDetailsUpdated} = useAuth();
-  const [isOrderDetailsUpdated, setOrderDetailsUpdated] = useState(
-    state.orderDetailsUpdated,
-  );
 
   const [oderData, setOrderData] = useState<RouteParams['data'] | null>(null);
 
@@ -163,16 +160,14 @@ const MapScreen = (props: Props) => {
   );
 
   const handleDeliverySuccessModal = () => {
-    setOrderDetailsUpdated(true);
     resetOrderDetailsUpdated();
   };
 
   const handleGoogleMapsNavigation = () => {
-    if (!myLocation || !orders[currentIndex]) return;
     openGoogleMapsNavigation(
       orders[currentIndex].latitude,
       orders[currentIndex].longitude,
-    ); // Call with destination coordinates
+    );
   };
 
   // const onPointPress = async () => {
@@ -411,7 +406,10 @@ const MapScreen = (props: Props) => {
                 <DestinationReachedModal
                   onPressFunction={() => {
                     setDestinationReached(false);
-                    navigate('DeliveryUpdate', {data: orders[currentIndex]});
+                    navigate('DeliveryUpdate', {
+                      data: orders[currentIndex],
+                      type: 'delivered',
+                    });
                   }}
                 />
               }

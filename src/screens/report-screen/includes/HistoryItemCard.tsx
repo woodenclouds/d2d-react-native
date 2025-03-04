@@ -24,10 +24,11 @@ import {openGoogleMapsNavigation} from '@app/utils/navigationUtils';
 type Props = {
   item: any;
   type?: string;
+  onAttemptPress?: () => void;
 };
 
 const HistoryItemCard = (props: Props) => {
-  const {item} = props;
+  const {item, onAttemptPress} = props;
 
   const arrowDegree = useSharedValue('0deg');
   const animateHight = useSharedValue(0);
@@ -75,9 +76,9 @@ const HistoryItemCard = (props: Props) => {
         <View>
           {props.type === 'history' ? (
             <DeliveredIcon />
-          ) : item.is_pickup && item.status === 'pending' ? (
+          ) : item.is_pickup && item.status === 'in_transit' ? (
             <PickupIcon />
-          ) : !item.is_pickup && item.status === 'pending' ? (
+          ) : !item.is_pickup && item.status === 'in_transit' ? (
             <DeliveryIcon />
           ) : (
             <AttemptIcon />
@@ -85,14 +86,12 @@ const HistoryItemCard = (props: Props) => {
         </View>
         <View>
           <Text style={styles.itemText} numberOfLines={1}>
-            {item?.address}
+            {item?.address || item?.location}
           </Text>
           {props.type !== 'history' ? (
-            !item.is_pickup ? (
-              item.status === 'pending' && (
-                <Text style={styles.subText}>Delivered within 30 min</Text>
-              )
-            ) : item.is_pickup && item.status === 'pending' ? (
+            !item.is_pickup && item.status === 'in_transit' ? (
+              <Text style={styles.subText}>Delivered within 30 min</Text>
+            ) : item.is_pickup && item.status === 'in_transit' ? (
               <Text style={styles.subText}>Pickup within 30 min</Text>
             ) : (
               <Text style={styles.subText}>
@@ -125,7 +124,9 @@ const HistoryItemCard = (props: Props) => {
           </View>
           <View style={styles.rowViewSpace}>
             <Text style={styles.labelText}>Recipient name</Text>
-            <Text style={styles.itemTextSmall}>{item?.recepient_name}</Text>
+            <Text style={styles.itemTextSmall}>
+              {item?.recepient_name || item?.customer_name}
+            </Text>
           </View>
           <View style={styles.rowViewSpace}>
             <Text style={styles.labelText}>Phone number</Text>
@@ -153,11 +154,23 @@ const HistoryItemCard = (props: Props) => {
                 <TouchableOpacity
                   style={styles.buttonContainer}
                   onPress={() => {
-                    navigate('DeliveryUpdate', {data: item});
+                    navigate('DeliveryUpdate', {
+                      data: item,
+                      type: item.is_pickup ? 'pickup' : 'delivered',
+                    });
                   }}>
-                  <Text style={styles.buttonText}>Delivered</Text>
+                  <Text style={styles.buttonText}>
+                    {item.is_pickup &&
+                    (item.status === 'ready_to_dispatch' ||
+                      item.status === 'in_transit' ||
+                      item.status === 'attempted')
+                      ? 'Pickup'
+                      : 'Delivered'}
+                  </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
+                  onPress={onAttemptPress}
+                  disabled={onAttemptPress ? false : true}
                   style={[styles.buttonContainer, {borderColor: '#FF8A3C'}]}>
                   <Text style={[styles.buttonText, {color: '#FF8A3C'}]}>
                     {item.attempted_count} Attempted
@@ -167,10 +180,15 @@ const HistoryItemCard = (props: Props) => {
               <Button
                 onPressFunction={handleGoogleMapsNavigation}
                 label={
-                  !item.is_pickup && item.status === 'pending'
+                  !item.is_pickup &&
+                  (item.status === 'ready_to_dispatch' ||
+                    item.status === 'in_transit' ||
+                    item.status === 'attempted')
                     ? 'Navigate to  delivery location'
                     : item.is_pickup &&
-                      item.status === 'pending' &&
+                      (item.status === 'ready_to_dispatch' ||
+                        item.status === 'in_transit' ||
+                        item.status === 'attempted') &&
                       'Navigate to pickup location'
                 }
                 buttonStyle={[styles.buttonStyle, {width: '100%'}]}

@@ -21,8 +21,6 @@ type Props = {
 const RouteDetailsModal = (props: Props) => {
   const {setVisible, onPressFunction, data, navigate} = props;
 
-  console.log(data, 'data=======');
-
   const navigateFunction = () => {
     onPressFunction && onPressFunction();
     setVisible(false);

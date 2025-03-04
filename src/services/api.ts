@@ -29,6 +29,8 @@ export const loginUser = async (email: string, password: string) => {
       password,
     });
 
+    console.log(response.data);
+
     if (response.data.StatusCode === 6000) {
       const {access, refresh} = response.data.data.response;
       const userId = response.data.data.user_id;
@@ -124,7 +126,26 @@ export const pickupOrders = async () => {
     if (!token) throw new Error('User is not authenticated');
 
     const response = await api.get(
-      '/orders/delivery-agent/orders/?order_type=assigned&is_pickup=true',
+      '/orders/delivery-agent/orders/?order_type=assigned&order_status=in_transit',
+      {
+        headers: {Authorization: `Bearer ${token}`},
+      },
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error('Assigned orders failed:', error);
+    throw error;
+  }
+};
+
+export const attemptedOrders = async () => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    if (!token) throw new Error('User is not authenticated');
+
+    const response = await api.get(
+      '/orders/delivery-agent/orders/?order_type=assigned&order_status=attempted',
       {
         headers: {Authorization: `Bearer ${token}`},
       },
@@ -307,7 +328,7 @@ export const submitDeliveryUpdate = async (
     }
 
     const response = await api.post(
-      `/orders/delivery-agent/delivery-update/${orderId}/?order_status=${deliveryStatus.toLocaleLowerCase()}`,
+      `/orders/delivery-agent/delivery-update/${orderId}/?order_status=${deliveryStatus.toLocaleLowerCase()}&delivery_type=delivery`,
       formData,
       {
         headers: {
@@ -320,6 +341,77 @@ export const submitDeliveryUpdate = async (
     return response.data;
   } catch (error) {
     console.error('Delivery update failed:', error);
+    throw error;
+  }
+};
+
+export const submitAttemptedOrder = async (
+  orderId: string,
+  notes: string,
+  delivery_type: string,
+) => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    if (!token) throw new Error('User is not authenticated');
+
+    const response = await api.post(
+      `/orders/delivery-agent/delivery-update/${orderId}/?order_status=attempted&delivery_type=${delivery_type}`,
+      {
+        notes: notes,
+      },
+      {
+        headers: {Authorization: `Bearer ${token}`},
+      },
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error('Attempted order failed:', error);
+    throw error;
+  }
+};
+
+export const PharmacyWiseOrders = async (pharmacy: string, status: string) => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    if (!token) throw new Error('User is not authenticated');
+
+    const response = await api.get(
+      `/orders/?pharmacy=${pharmacy}&status=${status}&is_mobile=true`,
+      {
+        headers: {Authorization: `Bearer ${token}`},
+      },
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error('Orders failed:', error);
+    throw error;
+  }
+};
+
+export const submitPickupOrder = async (
+  orderId: string,
+  notes: string,
+  delivery_type: string,
+) => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    if (!token) throw new Error('User is not authenticated');
+
+    const response = await api.post(
+      `/orders/delivery-agent/delivery-update/${orderId}/?order_status=delivered&delivery_type=${delivery_type}`,
+      {
+        notes: notes,
+      },
+      {
+        headers: {Authorization: `Bearer ${token}`},
+      },
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error('Pickup order failed:', error);
     throw error;
   }
 };

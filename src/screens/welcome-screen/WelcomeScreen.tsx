@@ -17,11 +17,8 @@ const WelcomeComponent = (props: WelcomeComponentProps) => {
 
   return (
     <View>
-      <Text style={styles.welcomeText}>
-        Improving <Text style={styles.colorText}>patient care</Text> with{' '}
-        <Text style={styles.colorText}>top notch</Text> operational{' '}
-        <Text style={styles.colorText}>solutions.</Text>
-      </Text>
+      <Text style={styles.colorText}>Fast & Reliable</Text>
+      <Text style={styles.welcomeText}>Pharmacy Delivery</Text>
       <Button
         label="Get Started"
         onPressFunction={() => {
@@ -46,6 +43,7 @@ const WelcomeScreen = (props: Props) => {
           children={<WelcomeComponent setModalVisible={setModalVisible} />}
           isVisible={modalVisible}
           setVisible={setModalVisible}
+          defaultClose={false}
         />
       </View>
     </SafeAreaWrapper>
@@ -72,5 +70,8 @@ const styles = StyleSheet.create({
   },
   colorText: {
     color: COLORS.primary,
+    fontSize: SIZES.wp(24 / 4.2),
+    ...FONTS.semiBold,
+    textAlign: 'center',
   },
 });

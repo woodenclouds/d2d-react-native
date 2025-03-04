@@ -32,7 +32,15 @@ const ModalInner = (props: ModalInnertProps) => {
 
     try {
       setIsLoading(true);
-      await login(email, password);
+      console.log('Attempting login with email:', email); // Debug log
+      const loginResult = await login(email, password); // Get the result
+
+      // Validate the result (ensure it contains expected fields)
+      if (!loginResult || !loginResult.access || !loginResult.userId) {
+        throw new Error('Login failed: Invalid response from server');
+      }
+
+      console.log('Login successful, navigating to BottomNavigation'); // Debug log
       setModalVisible(false);
       navigation.dispatch(
         CommonActions.reset({
@@ -41,7 +49,11 @@ const ModalInner = (props: ModalInnertProps) => {
         }),
       );
     } catch (error) {
-      Alert.alert('Login Failed', 'Invalid credentials or network error');
+      console.error('Login error in handleLogin:', error.message); // Debug log
+      Alert.alert(
+        'Login Failed',
+        error.message || 'Invalid credentials or network error',
+      );
     } finally {
       setIsLoading(false);
     }
@@ -84,6 +96,7 @@ const SignupScreen = (props: Props) => {
           children={<ModalInner setModalVisible={setModalVisible} />}
           isVisible={modalVisible}
           setVisible={setModalVisible}
+          defaultClose={false}
         />
       </View>
     </SafeAreaWrapper>

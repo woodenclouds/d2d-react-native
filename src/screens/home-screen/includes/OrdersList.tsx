@@ -8,6 +8,7 @@ import {navigate} from '@app/services/navigationService';
 
 type Props = {
   data: any;
+  setSelectItem?: (item: any) => void;
 };
 
 const OrdersList = (props: Props) => {
@@ -47,7 +48,14 @@ const OrdersList = (props: Props) => {
         </View>
       </View>
       {props.data.map((item: any, index: number) => (
-        <HistoryItemCard item={item} key={index} type={'assigned_orders'} />
+        <HistoryItemCard
+          item={item}
+          key={index}
+          type={'assigned_orders'}
+          onAttemptPress={() => {
+            navigate('DeliveryUpdate', {data: item, type: 'attempted'});
+          }}
+        />
       ))}
     </View>
   );

@@ -4,17 +4,18 @@ import {SIZES, FONTS, COLORS} from '@app/themes/themes';
 
 type Props = {
   data: any;
+  name: string;
 };
 
 const SpotLight = (props: Props) => {
-  const {data} = props;
+  const {data, name} = props;
 
   return (
     <View style={styles.container}>
       <View style={styles.imageContainer}>
         <Image source={require('@app/assets/images/spotlight_image.png')} />
       </View>
-      <Text style={styles.welcomeText}>👋 Welcome! Anooj Reji</Text>
+      <Text style={styles.welcomeText}>👋 Welcome! {name}</Text>
       <View style={styles.higlihtView}>
         <Text style={styles.titleText}>Total deliveries</Text>
         <Text style={styles.titleCountText}>{data?.total_deliveries}</Text>
