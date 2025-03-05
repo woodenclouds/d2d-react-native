@@ -11,11 +11,13 @@ import {navigateBack} from '@app/services/navigationService';
 import {useRoute, useNavigation} from '@react-navigation/native'; // Import useNavigation
 import * as ImagePicker from 'react-native-image-picker'; // For image picking
 import {useAuth} from '../../context/AuthContext'; // Import useAuth (adjust the path)
+import BottomModal from '@app/components/BottomModal';
 import {
   submitAttemptedOrder,
   submitDeliveryUpdate,
   submitPickupOrder,
 } from '@app/services/api';
+import ImageSelectModal from './includes/ImageSelectModal';
 
 type Props = {};
 
@@ -51,6 +53,7 @@ const DeliveryUpdate = (props: Props) => {
   const [isBulkOrder, setIsBulkOrder] = useState(false);
   const [amount, setAmount] = useState('0');
   const [paymentMethod, setPaymentMethod] = useState('Cash');
+  const [imageselectModal, setImageSelectModal] = useState(false);
 
   // Fetch initial data from navigation params
   useEffect(() => {
@@ -80,6 +83,7 @@ const DeliveryUpdate = (props: Props) => {
 
   // Handle image selection (maximum 3 images from gallery/camera)
   const handleAddImages = () => {
+    setImageSelectModal(false);
     if (images.length >= 3) {
       Alert.alert('Limit Reached', 'You can only add up to 3 images.');
       return;
@@ -89,6 +93,45 @@ const DeliveryUpdate = (props: Props) => {
       {
         mediaType: 'photo', // Only allow photos (not video), as per your design
         selectionLimit: 3, // Limit to 3 images maximum
+        includeBase64: false, // Use URI instead of base64 for better performance
+        includeExtra: false, // Exclude extra data to avoid permission issues
+      },
+      response => {
+        if (response.didCancel) {
+          console.log('User cancelled image picker');
+          return;
+        }
+        if (response.errorCode) {
+          console.error(
+            'ImagePicker Error:',
+            response.errorCode,
+            response.errorMessage,
+          );
+          return;
+        }
+        if (response.assets) {
+          const newImages = response.assets
+            .map(asset => asset.uri || asset.originalPath || '')
+            .slice(0, 3 - images.length); // Limit to remaining slots
+          setImages(prevImages => [
+            ...prevImages,
+            ...newImages.filter(Boolean),
+          ]);
+        }
+      },
+    );
+  };
+
+  const handleCaptureImage = () => {
+    setImageSelectModal(false);
+    if (images.length >= 3) {
+      Alert.alert('Limit Reached', 'You can only add up to 3 images.');
+      return;
+    }
+
+    ImagePicker.launchCamera(
+      {
+        mediaType: 'photo', // Only allow photos (not video), as per your design
         includeBase64: false, // Use URI instead of base64 for better performance
         includeExtra: false, // Exclude extra data to avoid permission issues
       },
@@ -218,6 +261,16 @@ const DeliveryUpdate = (props: Props) => {
           navigateBack();
         }}
       />
+      <BottomModal
+        children={
+          <ImageSelectModal
+            onPressCamera={handleCaptureImage}
+            onPressGallery={handleAddImages}
+          />
+        }
+        isVisible={imageselectModal}
+        setVisible={setImageSelectModal}
+      />
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <RecepientDetailsCard data={orderData} />
         <DeliveryDetailsCard
@@ -226,7 +279,9 @@ const DeliveryUpdate = (props: Props) => {
           setDeliveryStatus={setDeliveryStatus}
           signature={state.signature}
           images={images}
-          setImages={handleAddImages} // Pass function to add images
+          setImages={() => {
+            setImageSelectModal(true);
+          }} // Pass function to add images
           removeImage={handleRemoveImage} // Pass function to remove images
           notes={notes}
           setNotes={setNotes} // Pass function to update notes

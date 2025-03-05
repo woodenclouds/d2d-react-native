@@ -224,6 +224,39 @@ const HomeScreen = (props: Props) => {
               </View>
             </TouchableOpacity>
 
+            <View style={styles.rowfullView}>
+              <Text style={styles.titleText}>New Orders</Text>
+              <View style={styles.rowView}>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigate('OrdersPage', {});
+                  }}
+                  style={[
+                    styles.rowView,
+                    {
+                      height: SIZES.wp(32 / 4.2),
+                      paddingHorizontal: SIZES.wp(12 / 4.2),
+                      backgroundColor: '#fff',
+                      borderRadius: SIZES.wp(8 / 4.2),
+                    },
+                  ]}>
+                  <Text style={styles.buttonText}>View All</Text>
+                </TouchableOpacity>
+                {/* <TouchableOpacity
+            style={[
+              styles.rowView,
+              {
+                height: SIZES.wp(32 / 4.2),
+                paddingHorizontal: SIZES.wp(12 / 4.2),
+                backgroundColor: '#fff',
+                borderRadius: SIZES.wp(8 / 4.2),
+                marginLeft: SIZES.wp(8 / 4.2),
+              },
+            ]}>
+            <FilterIcon />
+          </TouchableOpacity> */}
+              </View>
+            </View>
             {loading ? (
               <ActivityIndicator size="large" color="#007bff" />
             ) : error ? (
@@ -320,5 +353,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#EEF0F1',
     padding: SIZES.wp(12 / 4.2),
     borderRadius: SIZES.wp(20 / 4.2),
+  },
+  rowfullView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: SIZES.wp(20 / 4.2),
+    paddingHorizontal: SIZES.wp(20 / 4.2),
+  },
+  titleText: {
+    ...FONTS.medium,
+    fontSize: SIZES.wp(16 / 4.2),
+    color: '#28292B',
+  },
+  buttonText: {
+    ...FONTS.regular,
+    fontSize: SIZES.wp(12 / 4.2),
+    color: COLORS.primary,
+    marginRight: SIZES.wp(8 / 4.2),
   },
 });

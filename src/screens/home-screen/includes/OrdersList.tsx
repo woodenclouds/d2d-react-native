@@ -14,39 +14,6 @@ type Props = {
 const OrdersList = (props: Props) => {
   return (
     <View style={styles.container}>
-      <View style={styles.rowfullView}>
-        <Text style={styles.titleText}>New Orders</Text>
-        <View style={styles.rowView}>
-          <TouchableOpacity
-            onPress={() => {
-              navigate('OrdersPage', {});
-            }}
-            style={[
-              styles.rowView,
-              {
-                height: SIZES.wp(32 / 4.2),
-                paddingHorizontal: SIZES.wp(12 / 4.2),
-                backgroundColor: '#fff',
-                borderRadius: SIZES.wp(8 / 4.2),
-              },
-            ]}>
-            <Text style={styles.buttonText}>View All</Text>
-          </TouchableOpacity>
-          {/* <TouchableOpacity
-            style={[
-              styles.rowView,
-              {
-                height: SIZES.wp(32 / 4.2),
-                paddingHorizontal: SIZES.wp(12 / 4.2),
-                backgroundColor: '#fff',
-                borderRadius: SIZES.wp(8 / 4.2),
-                marginLeft: SIZES.wp(8 / 4.2),
-              },
-            ]}>
-            <FilterIcon />
-          </TouchableOpacity> */}
-        </View>
-      </View>
       {props.data.map((item: any, index: number) => (
         <HistoryItemCard
           item={item}
