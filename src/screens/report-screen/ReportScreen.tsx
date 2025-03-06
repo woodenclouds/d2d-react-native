@@ -6,23 +6,24 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import SafeAreaWrapper from '@app/components/SafeAreaWrapper';
 import CommonHeader from '@app/components/CommonHeader';
 import TopCardItem from '../report-screen/includes/TopCardItem';
 import HistoryItemCard from './includes/HistoryItemCard';
-import {SIZES, FONTS} from '@app/themes/themes';
+import { SIZES, FONTS } from '@app/themes/themes';
 import ReportIcon from '@app/assets/icons/report_icon_blue.svg';
 import DollarIcon from '@app/assets/icons/dollar_icon.svg';
 import SearchIcon from '@app/assets/icons/search_icon.svg';
-import {assignedOrders, orderHistory, orderReports} from '@app/services/api';
-import {useAuth} from '../../context/AuthContext';
+import { assignedOrders, orderHistory, orderReports } from '@app/services/api';
+import { useAuth } from '../../context/AuthContext';
+import NoOrder from '@app/components/NoOrder';
 
 type Props = {};
 
 const ReportScreen = (props: Props) => {
-  const {checkIn, checkOut, state} = useAuth();
-  const {checkInId} = state;
+  const { checkIn, checkOut, state } = useAuth();
+  const { checkInId } = state;
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -80,7 +81,7 @@ const ReportScreen = (props: Props) => {
             totalDeliveries={reports?.total_deliveries}
             containerStyle={{
               ...styles.containerStyle,
-              ...{backgroundColor: '#F5E2C4'},
+              ...{ backgroundColor: '#F5E2C4' },
             }}
             label={'Payments collected'}
             icon={<DollarIcon />}
@@ -100,7 +101,9 @@ const ReportScreen = (props: Props) => {
         ) : error ? (
           <Text style={styles.error}>{error}</Text>
         ) : orders.length === 0 ? (
-          <Text style={styles.noOrders}>No assigned orders</Text>
+          <View style={styles.noReportsContainer}>
+            <NoOrder message="No reports found" />
+          </View>
         ) : (
           orders.data.map((item, index) => (
             <HistoryItemCard item={item} key={index} type={'history'} />
@@ -155,10 +158,7 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: 16,
   },
-  noOrders: {
-    fontSize: 16,
-    fontStyle: 'italic',
-    textAlign: 'center',
-    marginTop: SIZES.wp(40 / 4.2),
+  noReportsContainer: {
+    paddingTop: SIZES.wp(20 / 4.2),
   },
 });

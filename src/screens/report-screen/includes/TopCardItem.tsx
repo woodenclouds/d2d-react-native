@@ -41,6 +41,7 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: '#B0E2CD',
     borderRadius: SIZES.wp(16 / 4.2),
+    height: '100%'
   },
   titleView: {
     flexDirection: 'row',
