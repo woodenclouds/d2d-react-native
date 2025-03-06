@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  RefreshControl,
   View,
 } from 'react-native';
 import React, {useState, useEffect, useRef} from 'react';
@@ -57,6 +58,8 @@ const OrdersPage = (props: Props) => {
   const [attemptedOrder, setAttemptedOrder] = useState([]);
   const [attemptedLoading, setAttemptedLoading] = useState(true);
   const [attemptedError, setAttemptedError] = useState(null);
+
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchOrders();
@@ -163,6 +166,22 @@ const OrdersPage = (props: Props) => {
     setAttemptedModalVisible(false);
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true); // Start refreshing
+    try {
+      await Promise.all([
+        fetchOrders(),
+        fetchPickupOrders(),
+        fetchDeliveredOrders(),
+        fetchAttemptedOrders(),
+      ]);
+    } catch (err) {
+      console.log('Refresh failed:', err);
+    } finally {
+      setRefreshing(false); // Stop refreshing
+    }
+  };
+
   const filterData = () => {
     // Guard against undefined arrays
     const targetArray =
@@ -263,7 +282,15 @@ const OrdersPage = (props: Props) => {
             pagingEnabled
             horizontal
             showsHorizontalScrollIndicator={false}
-            onMomentumScrollEnd={handleContentScroll}>
+            onMomentumScrollEnd={handleContentScroll}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                colors={['#4A90E2']} // Customize refresh indicator color
+                progressBackgroundColor="#F5F7FA" // Background color of the refresh indicator
+              />
+            }>
             {tabs.map((tab, index) => (
               <View key={tab} style={{width: screenWidth}}>
                 <ScrollView contentContainerStyle={styles.contentContainer}>

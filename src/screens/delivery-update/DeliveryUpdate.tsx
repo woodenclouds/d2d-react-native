@@ -1,4 +1,14 @@
-import {ScrollView, StyleSheet, Text, View, Image, Alert} from 'react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  Alert,
+  PermissionsAndroid,
+  Permission,
+  Platform,
+} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import {SIZES, FONTS} from '@app/themes/themes';
 import SafeAreaWrapper from '@app/components/SafeAreaWrapper';
@@ -122,43 +132,66 @@ const DeliveryUpdate = (props: Props) => {
     );
   };
 
-  const handleCaptureImage = () => {
+  const handleCaptureImage = async () => {
     setImageSelectModal(false);
     if (images.length >= 3) {
       Alert.alert('Limit Reached', 'You can only add up to 3 images.');
       return;
     }
 
-    ImagePicker.launchCamera(
-      {
-        mediaType: 'photo', // Only allow photos (not video), as per your design
-        includeBase64: false, // Use URI instead of base64 for better performance
-        includeExtra: false, // Exclude extra data to avoid permission issues
-      },
-      response => {
-        if (response.didCancel) {
-          console.log('User cancelled image picker');
-          return;
-        }
-        if (response.errorCode) {
-          console.error(
-            'ImagePicker Error:',
-            response.errorCode,
-            response.errorMessage,
-          );
-          return;
-        }
-        if (response.assets) {
-          const newImages = response.assets
-            .map(asset => asset.uri || asset.originalPath || '')
-            .slice(0, 3 - images.length); // Limit to remaining slots
-          setImages(prevImages => [
-            ...prevImages,
-            ...newImages.filter(Boolean),
-          ]);
-        }
-      },
-    );
+    let permissionGranted = false;
+
+    // Request camera permission based on platform
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+        {
+          title: 'Camera Permission',
+          message: 'This app needs access to your camera to capture images.',
+          buttonPositive: 'OK',
+          buttonNegative: 'Cancel',
+        },
+      );
+      permissionGranted = granted === PermissionsAndroid.RESULTS.GRANTED;
+    }
+
+    if (permissionGranted) {
+      ImagePicker.launchCamera(
+        {
+          mediaType: 'photo',
+          includeBase64: false,
+          includeExtra: false,
+        },
+        response => {
+          if (response.didCancel) {
+            console.log('User cancelled camera');
+            return;
+          }
+          if (response.errorCode) {
+            console.error(
+              'ImagePicker Error:',
+              response.errorCode,
+              response.errorMessage,
+            );
+            return;
+          }
+          if (response.assets) {
+            const newImages = response.assets
+              .map(asset => asset.uri || asset.originalPath || '')
+              .slice(0, 3 - images.length);
+            setImages(prevImages => [
+              ...prevImages,
+              ...newImages.filter(Boolean),
+            ]);
+          }
+        },
+      );
+    } else {
+      Alert.alert(
+        'Permission Denied',
+        'Camera access is required to capture images. Please enable it in settings.',
+      );
+    }
   };
 
   // Handle removing an image

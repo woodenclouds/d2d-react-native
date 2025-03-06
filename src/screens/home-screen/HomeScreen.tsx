@@ -1,5 +1,6 @@
 import {
   ActivityIndicator,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -49,6 +50,8 @@ const HomeScreen = (props: Props) => {
   const [reports, setReports] = useState([]);
   const [orderReportLoading, setOrderReportLoading] = useState(true);
   const [orderReportError, setOrderReportError] = useState(null);
+
+  const [refreshing, setRefreshing] = useState(false); // State for refresh control
 
   const handleDeliverySuccessModal = () => {
     resetOrderDetailsUpdated();
@@ -114,10 +117,13 @@ const HomeScreen = (props: Props) => {
     try {
       const data = await orderReports(); // Call API
       setReports(data); // Store data in state
+      setOrderReportLoading(false);
     } catch (err) {
       setOrderReportError('Failed to load orders');
+      setOrderReportLoading(false);
     } finally {
       setOrderReportError(false);
+      setOrderReportLoading(false);
     }
   };
 
@@ -125,6 +131,17 @@ const HomeScreen = (props: Props) => {
     fetchOrders();
     fetchOrderReports();
   }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true); // Start refreshing
+    try {
+      await Promise.all([fetchOrders(), fetchOrderReports()]);
+    } catch (err) {
+      console.log('Refresh failed:', err);
+    } finally {
+      setRefreshing(false); // Stop refreshing
+    }
+  };
 
   const filterData = () => {
     if (!orders) return; // Guard against undefined (though initialized as [])
@@ -157,7 +174,15 @@ const HomeScreen = (props: Props) => {
     <>
       <SafeAreaWrapper backgroundColor="#F5F7FA" barStyle="dark-content">
         <GestureHandlerRootView>
-          <ScrollView>
+          <ScrollView
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                colors={['#4A90E2']} // Customize refresh indicator color
+                progressBackgroundColor="#F5F7FA" // Background color of the refresh indicator
+              />
+            }>
             <CenterModalBox
               isVisible={modalVisible}
               onBackButtonPress={() => {
