@@ -39,6 +39,7 @@ const PaymentDetailsCard = (props: Props) => {
             value={amount}
             onChangeText={setAmount}
             keyboardType="numeric"
+            editable={false}
           />
         </View>
         <View>

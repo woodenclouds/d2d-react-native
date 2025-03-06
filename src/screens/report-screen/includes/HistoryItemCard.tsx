@@ -1,7 +1,7 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React from 'react';
-import {SIZES, FONTS, COLORS} from '@app/themes/themes';
-import {convertToAMPM} from '@app/utils/dateTime';
+import { SIZES, FONTS, COLORS } from '@app/themes/themes';
+import { convertToAMPM } from '@app/utils/dateTime';
 import Animated, {
   measure,
   runOnJS,
@@ -76,9 +76,9 @@ const HistoryItemCard = (props: Props) => {
         <View>
           {props.type === 'history' ? (
             <DeliveredIcon />
-          ) : item.is_pickup && item.status === 'in_transit' ? (
+          ) : !item.is_pickup ? (
             <PickupIcon />
-          ) : !item.is_pickup && item.status === 'in_transit' ? (
+          ) : item.is_pickup ? (
             <DeliveryIcon />
           ) : (
             <AttemptIcon />
@@ -89,15 +89,18 @@ const HistoryItemCard = (props: Props) => {
             {item?.address || item?.location}
           </Text>
           {props.type !== 'history' ? (
-            !item.is_pickup && item.status === 'in_transit' ? (
-              <Text style={styles.subText}>Delivered within 30 min</Text>
-            ) : item.is_pickup && item.status === 'in_transit' ? (
-              <Text style={styles.subText}>Pickup within 30 min</Text>
-            ) : (
-              <Text style={styles.subText}>
-                Attempted {item.attempted_count} time
+            <>
+              {
+                !item.is_pickup ? (
+                  <Text style={styles.subText}>Ready to pickup</Text>
+                ) : (
+                  <Text style={styles.subText}>Ready to deliver</Text>
+                )
+              }
+              <Text style={[styles.subText, {color: '#FF8A3C'}]}>
+                {item.attempted_count} Attempt
               </Text>
-            )
+            </>
           ) : (
             <Text style={styles.subText}>Delivered</Text>
           )}
@@ -118,8 +121,16 @@ const HistoryItemCard = (props: Props) => {
               <Text style={styles.itemTextSmall}>#3498590</Text>
             </View>
             <View style={styles.rowViewSpace}>
+              <Text style={styles.labelText}>Pickup/Delivery</Text>
+              <Text style={styles.itemTextSmall}>{item?.is_pickup ? 'Pickup' : 'Delivery'}</Text>
+            </View>
+            <View style={styles.rowViewSpace}>
               <Text style={styles.labelText}>Order type</Text>
               <Text style={styles.itemTextSmall}>{item?.order_type}</Text>
+            </View>
+            <View style={styles.rowViewSpace}>
+              <Text style={styles.labelText}>Pharmacy name</Text>
+              <Text style={styles.itemTextSmall}>{item?.pharmacy_name}</Text>
             </View>
           </View>
           <View style={styles.rowViewSpace}>
@@ -133,8 +144,8 @@ const HistoryItemCard = (props: Props) => {
             <Text style={styles.itemTextSmall}>{item?.recepient_phone}</Text>
           </View>
           <View style={styles.rowViewSpace}>
-            <Text style={styles.labelText}>Pickup</Text>
-            <Text style={styles.itemTextSmall}>{item?.address}</Text>
+            <Text style={styles.labelText}>Pickup address</Text>
+            <Text style={styles.itemTextSmall}>{item?.is_pickup ? item?.address : `${item?.pharmacy_name}, \n ${item?.pharmacy_address}`}</Text>
           </View>
           <View style={styles.rowViewSpace}>
             <Text style={styles.labelText}>Delivery time</Text>
@@ -144,8 +155,8 @@ const HistoryItemCard = (props: Props) => {
             </Text>
           </View>
           <View style={styles.rowViewSpace}>
-            <Text style={styles.labelText}>Address</Text>
-            <Text style={styles.itemTextSmall}>{item?.address}</Text>
+            <Text style={styles.labelText}>Delivery address</Text>
+            <Text style={styles.itemTextSmall}>{!item?.is_pickup ? item?.address : `${item?.pharmacy_name}, \n ${item?.pharmacy_address}`}</Text>
           </View>
           {props.type !== 'history' && <View style={styles.lineView} />}
           {props.type !== 'history' && (
@@ -156,23 +167,23 @@ const HistoryItemCard = (props: Props) => {
                   onPress={() => {
                     navigate('DeliveryUpdate', {
                       data: item,
-                      type: item.is_pickup ? 'pickup' : 'delivered',
+                      type: item.is_pickup ? 'delivered' : 'pickup',
                     });
                   }}>
                   <Text style={styles.buttonText}>
                     {item.is_pickup &&
-                    (item.status === 'ready_to_dispatch' ||
-                      item.status === 'in_transit' ||
-                      item.status === 'attempted')
-                      ? 'Pickup'
-                      : 'Delivered'}
+                      (item.status === 'ready_to_dispatch' ||
+                        item.status === 'in_transit' ||
+                        item.status === 'attempted')
+                      ? 'Delivered'
+                      : 'Pick the order'}
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={onAttemptPress}
                   disabled={onAttemptPress ? false : true}
-                  style={[styles.buttonContainer, {borderColor: '#FF8A3C'}]}>
-                  <Text style={[styles.buttonText, {color: '#FF8A3C'}]}>
+                  style={[styles.buttonContainer, { borderColor: '#FF8A3C' }]}>
+                  <Text style={[styles.buttonText, { color: '#FF8A3C' }]}>
                     {item.attempted_count} Attempted
                   </Text>
                 </TouchableOpacity>
@@ -181,15 +192,15 @@ const HistoryItemCard = (props: Props) => {
                 onPressFunction={handleGoogleMapsNavigation}
                 label={
                   !item.is_pickup &&
-                  (item.status === 'ready_to_dispatch' ||
-                    item.status === 'in_transit' ||
-                    item.status === 'attempted')
-                    ? 'Navigate to  delivery location'
+                    (item.status === 'ready_to_dispatch' ||
+                      item.status === 'in_transit' ||
+                      item.status === 'attempted')
+                    ? 'Navigate to pickup location'
                     : item.is_pickup &&
-                      (item.status === 'ready_to_dispatch' ||
-                        item.status === 'in_transit' ||
-                        item.status === 'attempted') &&
-                      'Navigate to pickup location'
+                    (item.status === 'ready_to_dispatch' ||
+                      item.status === 'in_transit' ||
+                      item.status === 'attempted') &&
+                    'Navigate to delivery location'
                 }
                 buttonStyle={[styles.buttonStyle, {width: '100%'}]}
               />
@@ -224,9 +235,9 @@ const styles = StyleSheet.create({
     color: '#474747',
   },
   subText: {
-    ...FONTS.regular,
+    ...FONTS.medium,
     fontSize: SIZES.wp(12 / 4.2),
-    color: '#34B65F',
+    color: '#B064F7',
     marginTop: SIZES.wp(4 / 4.2),
   },
   lineView: {
@@ -238,11 +249,12 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     width: '100%',
-    height: SIZES.wp(100 / 4.2),
+    flex: 1,
     backgroundColor: '#F4F7FF',
     borderRadius: SIZES.wp(6 / 4.2),
     marginBottom: SIZES.wp(16 / 4.2),
-    padding: SIZES.wp(20 / 4.2),
+    paddingHorizontal: SIZES.wp(20 / 4.2),
+    paddingTop: SIZES.wp(20 / 4.2),
   },
   rowViewSpace: {
     flexDirection: 'row',

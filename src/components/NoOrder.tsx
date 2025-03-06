@@ -4,7 +4,6 @@ import NoteRemove from '@app/assets/icons/note_remove.svg'
 import { FONTS, SIZES } from '@app/themes/themes'
 
 const NoOrder = ({message}) => {
-    console.log("NoOrder component rendered");
     return (
         <View style={styles.noOrdersContainer}>
             <NoteRemove />

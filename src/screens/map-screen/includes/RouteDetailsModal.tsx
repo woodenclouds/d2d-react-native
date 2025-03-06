@@ -35,19 +35,22 @@ const RouteDetailsModal = (props: Props) => {
       </View>
       <View style={styles.DashLine}></View>
       <View style={styles.greyContainer}>
-        <View style={[styles.rowContainer, {marginBottom: SIZES.wp(10 / 4.2)}]}>
+        <View style={[styles.rowContainer, { marginBottom: SIZES.wp(10 / 4.2) }]}>
           <Text style={styles.detailsLabel}>Order id</Text>
           <Text style={styles.detailsText}>#f098098</Text>
         </View>
-        <View style={styles.rowContainer}>
+        <View style={[styles.rowContainer, { marginBottom: SIZES.wp(10 / 4.2) }]}>
+          <Text style={styles.detailsLabel}>Pickup/Delivery</Text>
+          <Text style={styles.detailsText}>{data?.is_pickup ? 'Pickup' : 'Delivery'}</Text>
+        </View>
+        <View style={[styles.rowContainer, { marginBottom: SIZES.wp(10 / 4.2) }]}>
           <Text style={styles.detailsLabel}>Order type</Text>
           <Text style={styles.detailsText}>{data?.order_type}</Text>
         </View>
-      </View>
-
-      <View style={styles.detailsContainer}>
-        <Text style={styles.detailsLabel}>Order type</Text>
-        <Text style={styles.detailsText}>{data?.order_type}</Text>
+        <View style={styles.rowContainer}>
+          <Text style={styles.detailsLabel}>Pharmacy name</Text>
+          <Text style={styles.detailsText}>{data?.pharmacy_name}</Text>
+        </View>
       </View>
 
       <View style={styles.detailsContainer}>
@@ -61,16 +64,21 @@ const RouteDetailsModal = (props: Props) => {
       </View>
 
       <View style={styles.detailsContainer}>
+        <Text style={styles.detailsLabel}>Pickup address</Text>
+        <Text style={styles.detailsText}>{data?.is_pickup ? data?.address : `${data?.pharmacy_name}, \n ${data?.pharmacy_address}`}</Text>
+      </View>
+
+      <View style={styles.detailsContainer}>
         <Text style={styles.detailsLabel}>Delivery time</Text>
         <Text style={styles.detailsText}>
           Between {data?.from_time} & {data?.to_time}
         </Text>
       </View>
 
-      <View style={[styles.detailsContainer, {alignItems: 'flex-start'}]}>
+      <View style={[styles.detailsContainer, { alignItems: 'flex-start' }]}>
         <Text style={styles.detailsLabel}>Address</Text>
-        <Text style={[styles.detailsText, {textAlign: 'right'}]}>
-          {data?.address}
+        <Text style={[styles.detailsText, { textAlign: 'right' }]}>
+          {!data?.is_pickup ? data?.address : `${data?.pharmacy_name} \n${data?.pharmacy_address}`}
         </Text>
       </View>
 
@@ -85,14 +93,14 @@ const RouteDetailsModal = (props: Props) => {
         <TouchableOpacity
           style={styles.buttonContainer}
           onPress={() => {
-            navigate('DeliveryUpdate', {data: data});
+            navigate('DeliveryUpdate', { data: data });
             setVisible(false);
           }}>
           <Text style={styles.buttonText}>Delivered</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.buttonContainer, {borderColor: '#FF8A3C'}]}>
-          <Text style={[styles.buttonText, {color: '#FF8A3C'}]}>
+          style={[styles.buttonContainer, { borderColor: '#FF8A3C' }]}>
+          <Text style={[styles.buttonText, { color: '#FF8A3C' }]}>
             {data.attempted_count} Attempted
           </Text>
         </TouchableOpacity>
@@ -101,7 +109,7 @@ const RouteDetailsModal = (props: Props) => {
         label="Navigate to delivery location"
         LeftIcon={<NavigateArrow />}
         onPressFunction={navigateFunction}
-        buttonStyle={{marginTop: 0}}
+        buttonStyle={{ marginTop: 0 }}
       />
     </View>
   );

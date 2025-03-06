@@ -42,7 +42,7 @@ const PharmacyCard = ({pharmacy}: PharmacyCardProps) => {
       <Divider color="#F5F7FA" marginVertical={0} />
       <View style={styles.ordersRow}>
         <Text style={styles.ordersText}>
-          Orders: {getCount(pharmacy.order_details)}
+          Pending Orders: {getCount(pharmacy.order_details)}
         </Text>
         <TouchableOpacity
           style={{flexDirection: 'row', alignItems: 'center'}}
