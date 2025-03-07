@@ -400,7 +400,7 @@ export const submitPickupOrder = async (
     if (!token) throw new Error('User is not authenticated');
 
     const response = await api.post(
-      `/orders/delivery-agent/delivery-update/${orderId}/?order_status=delivered&delivery_type=${delivery_type}`,
+      `/orders/delivery-agent/delivery-update/${orderId}/?order_status=in_transit&delivery_type=${delivery_type}`,
       {
         notes: notes,
       },

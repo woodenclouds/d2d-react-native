@@ -46,6 +46,7 @@ type RouteParams = {
     delivery_type: string;
     is_pickup: boolean;
     is_prepaid: boolean;
+    bill_amount: string;
   };
   type: string;
   signature?: string; // Optional signature param for updates
@@ -61,7 +62,7 @@ const DeliveryUpdate = (props: Props) => {
   const [images, setImages] = useState<string[]>([]); // Store image URIs
   const [notes, setNotes] = useState<string>(''); // Store notes
   const [isBulkOrder, setIsBulkOrder] = useState(false);
-  const [amount, setAmount] = useState('0');
+  // const [amount, setAmount] = useState('0');
   const [paymentMethod, setPaymentMethod] = useState('Cash');
   const [imageselectModal, setImageSelectModal] = useState(false);
 
@@ -210,18 +211,14 @@ const DeliveryUpdate = (props: Props) => {
         state.signature, // Use signature from Auth context
         false, // isBulk (set to false by default; update based on your state)
         notes,
-        amount, // amount (hardcoded as per your Node.js example; update based on your state)
+        orderData?.bill_amount, // amount (hardcoded as per your Node.js example; update based on your state)
         paymentMethod, // payment_method (empty as per your Node.js example; update based on your state)
         images,
       );
       if (response.StatusCode === 6000 || response.success) {
         // Adjust based on your API response structure
         console.log('Delivery update submitted successfully');
-        updateTempItem(
-          orderData.id,
-          'delivered',
-          orderData.is_pickup ? 'pickup' : 'delivery',
-        );
+        updateTempItem(orderData.id, 'delivered');
         clearSignature(); // Clear the signature from context after successful submission
         setOrderDetailsUpdated(true);
         navigateBack();
@@ -327,8 +324,8 @@ const DeliveryUpdate = (props: Props) => {
           deliveryStatus === 'Delivered' &&
           orderData?.is_prepaid !== true && (
             <PaymentDetailsCard
-              setAmount={setAmount}
-              amount={amount}
+              // setAmount={setAmount}
+              amount={orderData?.bill_amount}
               setPaymentMethod={setPaymentMethod}
               paymentMethod={paymentMethod}
             />

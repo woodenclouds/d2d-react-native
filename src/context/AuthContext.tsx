@@ -19,7 +19,6 @@ interface AuthState {
   tempItem: {
     itemId: string | null;
     itemType: string | null;
-    itemStatus: string | null;
   };
 }
 
@@ -47,7 +46,6 @@ type AuthAction =
       payload: {
         itemId: string | null;
         itemType: string | null;
-        itemStatus: string | null;
       };
     };
 
@@ -67,7 +65,6 @@ const initialState: AuthState = {
   tempItem: {
     itemId: null,
     itemType: null,
-    itemStatus: null,
   },
 };
 
@@ -117,11 +114,7 @@ interface AuthContextType {
   clearSignature: () => void; // Add method to clear
   setOrderDetailsUpdated: (updated: boolean) => void; // Method to set order details updated
   resetOrderDetailsUpdated: () => void; // Method to reset order details updated
-  updateTempItem: (
-    itemId: string | null,
-    itemType: string | null,
-    itemStatus: string | null,
-  ) => void;
+  updateTempItem: (itemId: string | null, itemType: string | null) => void;
 }
 
 // Create Context
@@ -257,14 +250,10 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
   };
 
   // Method to update temp item
-  const updateTempItem = (
-    itemId: string | null,
-    itemType: string | null,
-    itemStatus: string | null,
-  ) => {
+  const updateTempItem = (itemId: string | null, itemType: string | null) => {
     dispatch({
       type: 'UPDATE_TEMP_ITEM',
-      payload: {itemId, itemType, itemStatus},
+      payload: {itemId, itemType},
     });
   };
 

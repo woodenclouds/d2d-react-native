@@ -7,10 +7,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 
 import SafeAreaWrapper from '@app/components/SafeAreaWrapper';
-import { COLORS, SIZES, FONTS } from '@app/themes/themes';
+import {COLORS, SIZES, FONTS} from '@app/themes/themes';
 
 import SpotLight from './includes/SpotLight';
 import OrdersList from './includes/OrdersList';
@@ -18,9 +18,9 @@ import SigninButton from './includes/SigninButton';
 import CenterModalBox from '@app/components/CenterModalBox';
 import PunchOutModal from './includes/PunchOutModal';
 
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { navigate } from '@app/services/navigationService';
-import { useToast } from 'react-native-toast-notifications';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {navigate} from '@app/services/navigationService';
+import {useToast} from 'react-native-toast-notifications';
 
 import AppLogo from '@app/assets/icons/app_logo.svg';
 import BellIcon from '@app/assets/icons/bell_icon.svg';
@@ -28,8 +28,8 @@ import TickWithSparkle from '@app/assets/icons/tick_with_sparkle.svg';
 import CardBoard from '@app/assets/icons/card_board.svg';
 import ArrowRight from '@app/assets/icons/arrow_right.svg';
 
-import { useAuth } from '../../context/AuthContext';
-import { assignedOrders, orderReports } from '@app/services/api';
+import {useAuth} from '../../context/AuthContext';
+import {assignedOrders, orderReports} from '@app/services/api';
 import OrderDetailsUpdateModal from '../map-screen/includes/OrderDetailsUpdateModal';
 import NoOrder from '@app/components/NoOrder';
 
@@ -39,14 +39,16 @@ const HomeScreen = (props: Props) => {
   const toast = useToast();
   const [signIn, setSignIn] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const { checkIn, checkOut, state, resetOrderDetailsUpdated } = useAuth();
-  const { checkInId, tempItem } = state;
+  const {checkIn, checkOut, state, resetOrderDetailsUpdated} = useAuth();
+  const {checkInId, tempItem} = state;
 
   console.log(tempItem);
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  console.log(orders, 'orders');
 
   const [reports, setReports] = useState([]);
   const [orderReportLoading, setOrderReportLoading] = useState(true);
@@ -71,7 +73,7 @@ const HomeScreen = (props: Props) => {
 
   const showToast = () => {
     toast.show('', {
-      data: { renderToast: () => CustomToast() },
+      data: {renderToast: () => CustomToast()},
     });
   };
 
@@ -150,18 +152,16 @@ const HomeScreen = (props: Props) => {
     if (tempItem.itemType === 'attempted') {
       const updatedOrders = orders.map((item: any) =>
         item.id === tempItem.itemId
-          ? { ...item, attempted_count: (item.attempted_count || 0) + 1 }
+          ? {...item, attempted_count: (item.attempted_count || 0) + 1}
           : item,
       );
 
       setOrders(updatedOrders);
+    } else if (tempItem.itemType === 'delivered') {
+      const data = orders.filter((item: any) => item.id !== tempItem.itemId);
+      setOrders(data);
     } else {
-      if (tempItem.itemStatus === 'delivery') {
-        const data = orders.filter((item: any) => item.id !== tempItem.itemId);
-        setOrders(data);
-      } else {
-        return;
-      }
+      return;
     }
   };
 
@@ -289,7 +289,7 @@ const HomeScreen = (props: Props) => {
               <Text style={styles.error}>{error}</Text>
             ) : orders.length === 0 ? (
               <View style={styles.noOrdersContainer}>
-                <NoOrder message="No orders assigned yet, stay ready for the next delivery!"/>
+                <NoOrder message="No orders assigned yet, stay ready for the next delivery!" />
               </View>
             ) : (
               <OrdersList data={orders} />
@@ -402,6 +402,6 @@ const styles = StyleSheet.create({
     marginRight: SIZES.wp(8 / 4.2),
   },
   noOrdersContainer: {
-    paddingTop: SIZES.wp(20 / 4.2), 
+    paddingTop: SIZES.wp(20 / 4.2),
   },
 });

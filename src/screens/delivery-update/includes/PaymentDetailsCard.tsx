@@ -5,7 +5,7 @@ import CommonRadioButton from '@app/components/CommonRadioButton';
 
 type Props = {
   amount?: string;
-  setAmount?: (amount: string) => void;
+  // setAmount?: (amount: string) => void;
   paymentMethod?: string;
   setPaymentMethod?: (paymentMethod: string) => void;
 };
@@ -26,7 +26,10 @@ const methods_type = [
 ];
 
 const PaymentDetailsCard = (props: Props) => {
-  const {amount, setAmount, paymentMethod, setPaymentMethod} = props;
+  const {amount, paymentMethod, setPaymentMethod} = props;
+
+  console.log(amount, 'amount');
+
   return (
     <View style={styles.container}>
       <Text style={styles.headingText}>Payment Details</Text>
@@ -35,9 +38,9 @@ const PaymentDetailsCard = (props: Props) => {
           <Text style={styles.labelText}>Amount</Text>
           <TextInput
             style={styles.inputStyle}
-            placeholder="$"
-            value={amount}
-            onChangeText={setAmount}
+            placeholder={'$'}
+            value={`$ ${amount}`}
+            // onChangeText={setAmount}
             keyboardType="numeric"
             editable={false}
           />
