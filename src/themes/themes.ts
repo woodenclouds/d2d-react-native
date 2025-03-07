@@ -25,24 +25,24 @@ export const SIZES = {
 
 export const FONTS = {
   extraBold: {
-    fontFamily: 'Gilroy-ExtraBold',
+    fontFamily: 'Poppins-ExtraBold',
   },
   bold: {
-    fontFamily: 'Gilroy-Bold',
+    fontFamily: 'Poppins-Bold',
   },
   semiBold: {
-    fontFamily: 'Gilroy-SemiBold',
+    fontFamily: 'Poppins-SemiBold',
   },
   medium: {
-    fontFamily: 'Gilroy-Medium',
+    fontFamily: 'Poppins-Medium',
   },
   regular: {
-    fontFamily: 'Gilroy-Regular',
+    fontFamily: 'Poppins-Regular',
   },
   light: {
-    fontFamily: 'Gilroy-Light',
+    fontFamily: 'Poppins-Light',
   },
   extraLight: {
-    fontFamily: 'Gilroy-ExtraLight',
+    fontFamily: 'Poppins-ExtraLight',
   },
 };

@@ -35,7 +35,7 @@ import OrderDetailsUpdateModal from './includes/OrderDetailsUpdateModal';
 import {navigate} from '@app/services/navigationService';
 import {assignedOrders} from '@app/services/api';
 import {useAuth} from '../../context/AuthContext';
-import {useRoute} from '@react-navigation/native';
+import {useFocusEffect, useRoute} from '@react-navigation/native';
 import {Linking} from 'react-native';
 import {openGoogleMapsNavigation} from '@app/utils/navigationUtils'; // Import the new function name (adjust path)
 
@@ -107,22 +107,23 @@ const MapScreen = (props: Props) => {
   }, []);
 
   // Fetch orders and set loading state
+  const fetchOrders = async () => {
+    setIsLoading(true);
+    try {
+      const data = await assignedOrders();
+      setOrders(data.data);
+      setOrderData(data.data[0]);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchOrders = async () => {
-      setIsLoading(true);
-      try {
-        const data = await assignedOrders();
-        setOrders(data.data);
-        setOrderData(data.data[0]);
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
     fetchOrders();
   }, []);
-
+  
   // Automatically point to the first order and fetch directions when orders are loaded
   useEffect(() => {
     if (!isLoading && orders.length > 0 && myLocation) {
@@ -273,6 +274,11 @@ const MapScreen = (props: Props) => {
     };
   }, [moreInfoVisible]);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchOrders();
+    }, []),
+  );
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>

@@ -32,6 +32,7 @@ import {useAuth} from '../../context/AuthContext';
 import {assignedOrders, orderReports} from '@app/services/api';
 import OrderDetailsUpdateModal from '../map-screen/includes/OrderDetailsUpdateModal';
 import NoOrder from '@app/components/NoOrder';
+import { useFocusEffect } from '@react-navigation/native';
 
 type Props = {};
 
@@ -115,6 +116,12 @@ const HomeScreen = (props: Props) => {
       setLoading(false);
     }
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchOrders();
+    }, []),
+  );
 
   const fetchOrderReports = async () => {
     try {

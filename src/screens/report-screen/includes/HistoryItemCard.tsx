@@ -1,7 +1,7 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React from 'react';
-import {SIZES, FONTS, COLORS} from '@app/themes/themes';
-import {convertToAMPM} from '@app/utils/dateTime';
+import { SIZES, FONTS, COLORS } from '@app/themes/themes';
+import { convertToAMPM } from '@app/utils/dateTime';
 import Animated, {
   measure,
   runOnJS,
@@ -18,8 +18,9 @@ import PickupIcon from '@app/assets/icons/pickup_icon.svg';
 import AttemptIcon from '@app/assets/icons/attempt_icon.svg';
 import DownArrow from '@app/assets/icons/down_arrow.svg';
 import Button from '@app/components/Button';
-import {navigate} from '@app/services/navigationService';
-import {openGoogleMapsNavigation} from '@app/utils/navigationUtils';
+import { navigate } from '@app/services/navigationService';
+import { openGoogleMapsNavigation } from '@app/utils/navigationUtils';
+import DeliveryVehicleIcon from '@app/assets/icons/delivery_vehicle.svg';
 
 type Props = {
   item: any;
@@ -28,7 +29,8 @@ type Props = {
 };
 
 const HistoryItemCard = (props: Props) => {
-  const {item, onAttemptPress} = props;
+  const { item, onAttemptPress } = props;
+  console.log(item, "item");
 
   const arrowDegree = useSharedValue('0deg');
   const animateHight = useSharedValue(0);
@@ -51,7 +53,7 @@ const HistoryItemCard = (props: Props) => {
 
   const rotateArrowStyle = useAnimatedStyle(() => {
     return {
-      transform: [{rotate: withTiming(arrowDegree.value)}],
+      transform: [{ rotate: withTiming(arrowDegree.value) }],
     };
   });
 
@@ -109,18 +111,32 @@ const HistoryItemCard = (props: Props) => {
         </View>
         <View>
           <Text style={styles.itemText} numberOfLines={1}>
-            {item?.address || item?.location}
+            {
+              item.is_pickup ? (
+                item.next_action === 'pickup' ? (
+                  item?.address || item?.location
+                ) : (
+                  item?.pharmacy_address || item?.location
+                )
+              ) : (
+                item.next_action === 'pickup' ? (
+                  item?.pharmacy_address || item?.location
+                ) : (
+                  item?.address || item?.location
+                )
+              )
+            }
           </Text>
           {props.type !== 'history' ? (
             <>
               {item.next_action === 'pickup' ? (
                 <Text style={styles.subText}>Ready to pickup</Text>
               ) : (
-                <Text style={[styles.subText, {color: '#5BDAAC'}]}>
+                <Text style={[styles.subText, { color: '#007DDC' }]}>
                   Ready to deliver
                 </Text>
               )}
-              <Text style={[styles.subText, {color: '#FF8A3C'}]}>
+              <Text style={[styles.subText, { color: '#676767' }]}>
                 {item.attempted_count} Attempt
               </Text>
             </>
@@ -128,9 +144,12 @@ const HistoryItemCard = (props: Props) => {
             <Text style={styles.subText}>Delivered</Text>
           )}
         </View>
-        <Animated.View style={rotateArrowStyle}>
-          <DownArrow />
-        </Animated.View>
+        <View style={styles.arrowContainer}>
+          <Animated.View style={rotateArrowStyle}>
+            <DownArrow />
+          </Animated.View>
+          {item?.order_type && <DeliveryVehicleIcon />}
+        </View>
       </View>
       <Animated.View style={animateViewStyle}>
         <Animated.View
@@ -141,7 +160,7 @@ const HistoryItemCard = (props: Props) => {
           <View style={styles.imageContainer}>
             <View style={styles.rowViewSpace}>
               <Text style={styles.labelText}>Order id</Text>
-              <Text style={styles.itemTextSmall}>#3498590</Text>
+              <Text style={styles.itemTextSmall}>{item?.order_id}</Text>
             </View>
             <View style={styles.rowViewSpace}>
               <Text style={styles.labelText}>Pickup/Delivery</Text>
@@ -215,8 +234,8 @@ const HistoryItemCard = (props: Props) => {
                 <TouchableOpacity
                   onPress={onAttemptPress}
                   disabled={onAttemptPress ? false : true}
-                  style={[styles.buttonContainer, {borderColor: '#FF8A3C'}]}>
-                  <Text style={[styles.buttonText, {color: '#FF8A3C'}]}>
+                  style={[styles.buttonContainer, { borderColor: '#FF8A3C' }]}>
+                  <Text style={[styles.buttonText, { color: '#FF8A3C' }]}>
                     {item.attempted_count} Attempted
                   </Text>
                 </TouchableOpacity>
@@ -228,7 +247,7 @@ const HistoryItemCard = (props: Props) => {
                     ? 'Navigate to delivery location'
                     : 'Navigate to pickup location'
                 }
-                buttonStyle={[styles.buttonStyle, {width: '100%'}]}
+                buttonStyle={[styles.buttonStyle, { width: '100%' }]}
               />
             </>
           )}
@@ -256,14 +275,14 @@ const styles = StyleSheet.create({
   },
   itemText: {
     width: SIZES.wp(248 / 4.2),
-    ...FONTS.regular,
-    fontSize: SIZES.wp(14 / 4.2),
+    ...FONTS.semiBold,
+    fontSize: SIZES.wp(16 / 4.2),
     color: '#474747',
   },
   subText: {
     ...FONTS.medium,
     fontSize: SIZES.wp(12 / 4.2),
-    color: '#B064F7',
+    color: '#00A76A',
     marginTop: SIZES.wp(4 / 4.2),
   },
   lineView: {
@@ -341,5 +360,8 @@ const styles = StyleSheet.create({
     ...FONTS.regular,
     fontSize: SIZES.wp(14 / 4.2),
     color: '#003FF0',
+  },
+  arrowContainer: {
+    rowGap: SIZES.wp(16 / 4.2),
   },
 });

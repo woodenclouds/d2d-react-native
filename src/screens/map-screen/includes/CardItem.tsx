@@ -1,6 +1,6 @@
-import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
-import React, {useEffect} from 'react';
-import {SIZES, COLORS, FONTS} from '@app/themes/themes';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import React, { useEffect } from 'react';
+import { SIZES, COLORS, FONTS } from '@app/themes/themes';
 import GreenBox from '@app/assets/icons/green_box.svg';
 import NavigateIcon from '@app/assets/icons/navigate_icon.svg';
 import Animated, {
@@ -9,6 +9,11 @@ import Animated, {
   SharedValue,
   Extrapolation,
 } from 'react-native-reanimated';
+import DeliveryVehicleIcon from '@app/assets/icons/delivery_vehicle.svg';
+import DeliveryIcon from '@app/assets/icons/delivery_green_icon.svg';
+import DeliveredIcon from '@app/assets/icons/delivered_icon.svg';
+import PickupIcon from '@app/assets/icons/pickup_icon.svg';
+import AttemptIcon from '@app/assets/icons/attempt_icon.svg';
 
 type Props = {
   item: any;
@@ -21,7 +26,8 @@ type Props = {
 const width = SIZES.wp('100%');
 
 const CardItem = (props: Props) => {
-  const {index, scrollX, currentIndex, onPressFunction, item} = props;
+  const { index, scrollX, currentIndex, onPressFunction, item } = props;
+  console.log(item, "card item map screen");
 
   const swipeAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -45,19 +51,53 @@ const CardItem = (props: Props) => {
         activeOpacity={0.7}
         style={[
           styles.cardContainer,
-          {borderColor: currentIndex === index ? COLORS.primary : '#fff'},
+          { borderColor: currentIndex === index ? COLORS.primary : '#fff' },
         ]}>
         <View style={styles.rowContainer}>
-          <GreenBox />
+          {/* <GreenBox /> */}
+          <View>
+            {props.type === 'history' ? (
+              <DeliveredIcon />
+            ) : item.next_action === 'pickup' ? (
+              <PickupIcon />
+            ) : item.next_action === 'delivery' ? (
+              <DeliveryIcon />
+            ) : (
+              <AttemptIcon />
+            )}
+          </View>
           <View style={styles.contentSide}>
             <Text style={styles.streetName} numberOfLines={1}>
-              {item?.address}
+              {/* {item?.address} */}
+              {
+                item.is_pickup ? (
+                  item.next_action === 'pickup' ? (
+                    item?.address || item?.location
+                  ) : (
+                    item?.pharmacy_address || item?.location
+                  )
+                ) : (
+                  item.next_action === 'pickup' ? (
+                    item?.pharmacy_address || item?.location
+                  ) : (
+                    item?.address || item?.location
+                  )
+                )
+              }
             </Text>
             <View style={styles.rowTextView}>
-              <Text style={styles.statusText}>Delivery</Text>
-              <Text style={styles.distanceText}>2km</Text>
+              {/* <Text style={styles.statusText}>Delivery</Text> */}
+              {item.next_action === 'pickup' ? (
+                <Text style={styles.subText}>Ready to pickup</Text>
+              ) : (
+                <Text style={[styles.subText, { color: '#007DDC' }]}>
+                  Ready to deliver
+                </Text>
+              )}
+              {/* <Text style={styles.distanceText}>2km</Text> */}
+              {item?.order_type && <DeliveryVehicleIcon />}
             </View>
-            <View style={[styles.rowTextView, {marginTop: SIZES.wp(16 / 4.2)}]}>
+            <View style={[styles.rowTextView, { marginTop: SIZES.wp(16 / 4.2) }]}>
               <Text style={styles.detailsText}>View Details</Text>
               <NavigateIcon />
             </View>
@@ -97,7 +137,7 @@ const styles = StyleSheet.create({
     ...FONTS.regular,
     fontSize: SIZES.wp(14 / 4.2),
     color: '#1C1C1C',
-    marginBottom: SIZES.wp(6 / 4.2),
+    marginBottom: SIZES.wp(3 / 4.2),
   },
   rowTextView: {
     flexDirection: 'row',
@@ -118,5 +158,11 @@ const styles = StyleSheet.create({
     ...FONTS.regular,
     fontSize: SIZES.wp(12 / 4.2),
     color: COLORS.primary,
+  },
+  subText: {
+    ...FONTS.medium,
+    fontSize: SIZES.wp(12 / 4.2),
+    color: '#B064F7',
+    // marginTop: SIZES.wp(4 / 4.2),
   },
 });

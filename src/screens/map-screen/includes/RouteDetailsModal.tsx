@@ -37,7 +37,7 @@ const RouteDetailsModal = (props: Props) => {
       <View style={styles.greyContainer}>
         <View style={[styles.rowContainer, { marginBottom: SIZES.wp(10 / 4.2) }]}>
           <Text style={styles.detailsLabel}>Order id</Text>
-          <Text style={styles.detailsText}>#f098098</Text>
+          <Text style={styles.detailsText}>{data?.order_id}</Text>
         </View>
         <View style={[styles.rowContainer, { marginBottom: SIZES.wp(10 / 4.2) }]}>
           <Text style={styles.detailsLabel}>Pickup/Delivery</Text>
