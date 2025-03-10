@@ -105,6 +105,7 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     paddingHorizontal: SIZES.wp(20 / 4.2),
+    marginTop: SIZES.wp(20 / 4.2),
     marginBottom: SIZES.wp(24 / 4.2),
   },
   Miancontainer: {

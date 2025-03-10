@@ -1,7 +1,7 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
-import { SIZES, FONTS, COLORS } from '@app/themes/themes';
-import { convertToAMPM } from '@app/utils/dateTime';
+import {SIZES, FONTS, COLORS} from '@app/themes/themes';
+import {convertToAMPM} from '@app/utils/dateTime';
 import Animated, {
   measure,
   runOnJS,
@@ -18,8 +18,8 @@ import PickupIcon from '@app/assets/icons/pickup_icon.svg';
 import AttemptIcon from '@app/assets/icons/attempt_icon.svg';
 import DownArrow from '@app/assets/icons/down_arrow.svg';
 import Button from '@app/components/Button';
-import { navigate } from '@app/services/navigationService';
-import { openGoogleMapsNavigation } from '@app/utils/navigationUtils';
+import {navigate} from '@app/services/navigationService';
+import {openGoogleMapsNavigation} from '@app/utils/navigationUtils';
 import DeliveryVehicleIcon from '@app/assets/icons/delivery_vehicle.svg';
 
 type Props = {
@@ -29,8 +29,8 @@ type Props = {
 };
 
 const HistoryItemCard = (props: Props) => {
-  const { item, onAttemptPress } = props;
-  console.log(item, "item");
+  const {item, onAttemptPress} = props;
+  console.log(item, 'item');
 
   const arrowDegree = useSharedValue('0deg');
   const animateHight = useSharedValue(0);
@@ -53,7 +53,7 @@ const HistoryItemCard = (props: Props) => {
 
   const rotateArrowStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ rotate: withTiming(arrowDegree.value) }],
+      transform: [{rotate: withTiming(arrowDegree.value)}],
     };
   });
 
@@ -111,32 +111,24 @@ const HistoryItemCard = (props: Props) => {
         </View>
         <View>
           <Text style={styles.itemText} numberOfLines={1}>
-            {
-              item.is_pickup ? (
-                item.next_action === 'pickup' ? (
-                  item?.address || item?.location
-                ) : (
-                  item?.pharmacy_address || item?.location
-                )
-              ) : (
-                item.next_action === 'pickup' ? (
-                  item?.pharmacy_address || item?.location
-                ) : (
-                  item?.address || item?.location
-                )
-              )
-            }
+            {item.is_pickup
+              ? item.next_action === 'pickup'
+                ? item?.address || item?.location
+                : item?.pharmacy_address || item?.location
+              : item.next_action === 'pickup'
+              ? item?.pharmacy_address || item?.location
+              : item?.address || item?.location}
           </Text>
           {props.type !== 'history' ? (
             <>
               {item.next_action === 'pickup' ? (
                 <Text style={styles.subText}>Ready to pickup</Text>
               ) : (
-                <Text style={[styles.subText, { color: '#007DDC' }]}>
+                <Text style={[styles.subText, {color: '#007DDC'}]}>
                   Ready to deliver
                 </Text>
               )}
-              <Text style={[styles.subText, { color: '#676767' }]}>
+              <Text style={[styles.subText, {color: '#676767'}]}>
                 {item.attempted_count} Attempt
               </Text>
             </>
@@ -148,7 +140,7 @@ const HistoryItemCard = (props: Props) => {
           <Animated.View style={rotateArrowStyle}>
             <DownArrow />
           </Animated.View>
-          {item?.order_type && <DeliveryVehicleIcon />}
+          {item?.order_type === 'Express' && <DeliveryVehicleIcon />}
         </View>
       </View>
       <Animated.View style={animateViewStyle}>
@@ -234,8 +226,8 @@ const HistoryItemCard = (props: Props) => {
                 <TouchableOpacity
                   onPress={onAttemptPress}
                   disabled={onAttemptPress ? false : true}
-                  style={[styles.buttonContainer, { borderColor: '#FF8A3C' }]}>
-                  <Text style={[styles.buttonText, { color: '#FF8A3C' }]}>
+                  style={[styles.buttonContainer, {borderColor: '#FF8A3C'}]}>
+                  <Text style={[styles.buttonText, {color: '#FF8A3C'}]}>
                     {item.attempted_count} Attempted
                   </Text>
                 </TouchableOpacity>
@@ -247,7 +239,7 @@ const HistoryItemCard = (props: Props) => {
                     ? 'Navigate to delivery location'
                     : 'Navigate to pickup location'
                 }
-                buttonStyle={[styles.buttonStyle, { width: '100%' }]}
+                buttonStyle={[styles.buttonStyle, {width: '100%'}]}
               />
             </>
           )}

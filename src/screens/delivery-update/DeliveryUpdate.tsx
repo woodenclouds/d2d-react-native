@@ -204,6 +204,11 @@ const DeliveryUpdate = (props: Props) => {
   const handleSubmit = async () => {
     if (!orderData) return;
 
+    if (state.signature === null || images === []) {
+      Alert.alert('Error', 'Please add signature or images before submitting.');
+      return;
+    }
+
     try {
       const response = await submitDeliveryUpdate(
         orderData.id, // Use order ID as orderId
