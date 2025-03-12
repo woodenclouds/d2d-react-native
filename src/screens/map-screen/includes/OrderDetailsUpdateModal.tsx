@@ -20,7 +20,7 @@ const OrderDetailsUpdateModal = (props: Props) => {
       </View>
       <Text style={styles.textStyle}>Order details updated successfully.</Text>
       <Button
-        label="Navigate to next order"
+        label="Continue"
         onPressFunction={onPressFunction}
         buttonStyle={{marginTop: SIZES.wp(32 / 4.2)}}
       />

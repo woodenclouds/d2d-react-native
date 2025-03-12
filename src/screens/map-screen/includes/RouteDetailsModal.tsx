@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import {SIZES, FONTS, COLORS} from '@app/themes/themes';
 import Button from '@app/components/Button';
 import DeliveryHistoryIcon from '@app/assets/icons/delivery_history_icon.svg';
@@ -26,6 +26,12 @@ const RouteDetailsModal = (props: Props) => {
     setVisible(false);
   };
 
+  const handleAttemptPress = () => {
+    navigate('DeliveryUpdate', {data: data, type: 'attempted'});
+    setVisible(false);
+    // setAttemptedModalVisible(false);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.smallDash}></View>
@@ -35,15 +41,17 @@ const RouteDetailsModal = (props: Props) => {
       </View>
       <View style={styles.DashLine}></View>
       <View style={styles.greyContainer}>
-        <View style={[styles.rowContainer, { marginBottom: SIZES.wp(10 / 4.2) }]}>
+        <View style={[styles.rowContainer, {marginBottom: SIZES.wp(10 / 4.2)}]}>
           <Text style={styles.detailsLabel}>Order id</Text>
           <Text style={styles.detailsText}>{data?.order_id}</Text>
         </View>
-        <View style={[styles.rowContainer, { marginBottom: SIZES.wp(10 / 4.2) }]}>
+        <View style={[styles.rowContainer, {marginBottom: SIZES.wp(10 / 4.2)}]}>
           <Text style={styles.detailsLabel}>Pickup/Delivery</Text>
-          <Text style={styles.detailsText}>{data?.is_pickup ? 'Pickup' : 'Delivery'}</Text>
+          <Text style={styles.detailsText}>
+            {data?.is_pickup ? 'Pickup' : 'Delivery'}
+          </Text>
         </View>
-        <View style={[styles.rowContainer, { marginBottom: SIZES.wp(10 / 4.2) }]}>
+        <View style={[styles.rowContainer, {marginBottom: SIZES.wp(10 / 4.2)}]}>
           <Text style={styles.detailsLabel}>Order type</Text>
           <Text style={styles.detailsText}>{data?.order_type}</Text>
         </View>
@@ -65,7 +73,11 @@ const RouteDetailsModal = (props: Props) => {
 
       <View style={styles.detailsContainer}>
         <Text style={styles.detailsLabel}>Pickup address</Text>
-        <Text style={styles.detailsText}>{data?.is_pickup ? data?.address : `${data?.pharmacy_name}, \n ${data?.pharmacy_address}`}</Text>
+        <Text style={styles.detailsText}>
+          {data?.is_pickup
+            ? data?.address
+            : `${data?.pharmacy_name}, \n ${data?.pharmacy_address}`}
+        </Text>
       </View>
 
       <View style={styles.detailsContainer}>
@@ -75,10 +87,12 @@ const RouteDetailsModal = (props: Props) => {
         </Text>
       </View>
 
-      <View style={[styles.detailsContainer, { alignItems: 'flex-start' }]}>
+      <View style={[styles.detailsContainer, {alignItems: 'flex-start'}]}>
         <Text style={styles.detailsLabel}>Address</Text>
-        <Text style={[styles.detailsText, { textAlign: 'right' }]}>
-          {!data?.is_pickup ? data?.address : `${data?.pharmacy_name} \n${data?.pharmacy_address}`}
+        <Text style={[styles.detailsText, {textAlign: 'right'}]}>
+          {!data?.is_pickup
+            ? data?.address
+            : `${data?.pharmacy_name} \n${data?.pharmacy_address}`}
         </Text>
       </View>
 
@@ -93,23 +107,35 @@ const RouteDetailsModal = (props: Props) => {
         <TouchableOpacity
           style={styles.buttonContainer}
           onPress={() => {
-            navigate('DeliveryUpdate', { data: data });
+            navigate('DeliveryUpdate', {
+              data: data,
+              type: data.next_action === 'delivery' ? 'delivered' : 'pickup',
+            });
             setVisible(false);
           }}>
-          <Text style={styles.buttonText}>Delivered</Text>
+          <Text style={styles.buttonText}>
+            {' '}
+            {data.next_action === 'delivery' ? 'Delivered' : 'Pick the order'}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.buttonContainer, { borderColor: '#FF8A3C' }]}>
-          <Text style={[styles.buttonText, { color: '#FF8A3C' }]}>
+          onPress={handleAttemptPress}
+          //  disabled={onAttemptPress ? false : true}
+          style={[styles.buttonContainer, {borderColor: '#FF8A3C'}]}>
+          <Text style={[styles.buttonText, {color: '#FF8A3C'}]}>
             {data.attempted_count} Attempted
           </Text>
         </TouchableOpacity>
       </View>
       <Button
-        label="Navigate to delivery location"
+        label={
+          data.next_action === 'delivery'
+            ? 'Navigate to delivery location'
+            : 'Navigate to pickup location'
+        }
         LeftIcon={<NavigateArrow />}
         onPressFunction={navigateFunction}
-        buttonStyle={{ marginTop: 0 }}
+        buttonStyle={{marginTop: 0}}
       />
     </View>
   );

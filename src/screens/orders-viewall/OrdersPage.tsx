@@ -8,12 +8,12 @@ import {
   RefreshControl,
   View,
 } from 'react-native';
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import SafeAreaWrapper from '@app/components/SafeAreaWrapper';
 import CommonHeader from '@app/components/CommonHeader';
-import { navigate, navigateBack } from '@app/services/navigationService';
+import {navigate, navigateBack} from '@app/services/navigationService';
 import FilterIcon from '@app/assets/icons/filter_icon.svg';
-import { FONTS, SIZES } from '@app/themes/themes';
+import {FONTS, SIZES} from '@app/themes/themes';
 import HistoryItemCard from '../report-screen/includes/HistoryItemCard';
 import BottomModal from '@app/components/BottomModal';
 import FilterModal from './inludes/FilterModal';
@@ -25,17 +25,17 @@ import {
   attemptedOrders,
 } from '@app/services/api';
 import CenterModalBox from '@app/components/CenterModalBox';
-import { useAuth } from '../../context/AuthContext';
+import {useAuth} from '../../context/AuthContext';
 import OrderDetailsUpdateModal from '../map-screen/includes/OrderDetailsUpdateModal';
 import AttemptedModal from './inludes/AttemptedModal';
 import NoOrder from '@app/components/NoOrder';
 
-const { width: screenWidth } = Dimensions.get('window');
+const {width: screenWidth} = Dimensions.get('window');
 
 type Props = {};
 
 const OrdersPage = (props: Props) => {
-  const { state, resetOrderDetailsUpdated } = useAuth();
+  const {state, resetOrderDetailsUpdated} = useAuth();
   const [activeTab, setActiveTab] = useState(0);
   const contentScrollRef = useRef<ScrollView>(null);
   const tabs = ['Pending', 'Picked', 'Attempted', 'Delivered'];
@@ -163,7 +163,7 @@ const OrdersPage = (props: Props) => {
   };
 
   const handleAttemptPress = () => {
-    navigate('DeliveryUpdate', { data: selectItem, type: 'attempted' });
+    navigate('DeliveryUpdate', {data: selectItem, type: 'attempted'});
     setAttemptedModalVisible(false);
   };
 
@@ -189,23 +189,23 @@ const OrdersPage = (props: Props) => {
       activeTab === 0
         ? orders
         : activeTab === 1
-          ? openToPickOrders
-          : attemptedOrder;
+        ? openToPickOrders
+        : attemptedOrder;
 
     if (!targetArray) return;
 
     if (state.tempItem.itemType === 'attempted') {
       const updatedArray = targetArray.map((item: any) =>
         item.id === state.tempItem.itemId
-          ? { ...item, attempted_count: (item.attempted_count || 0) + 1 }
+          ? {...item, attempted_count: (item.attempted_count || 0) + 1}
           : item,
       );
       // Update the corresponding state based on activeTab
       activeTab === 0
         ? setOrders(updatedArray)
         : activeTab === 1
-          ? setOpenToPickOrders(updatedArray)
-          : setAttemptedOrder(updatedArray);
+        ? setOpenToPickOrders(updatedArray)
+        : setAttemptedOrder(updatedArray);
     } else {
       if (state.tempItem.itemStatus === 'delivery') {
         const filteredArray = targetArray.filter(
@@ -215,8 +215,8 @@ const OrdersPage = (props: Props) => {
         activeTab === 0
           ? setOrders(filteredArray)
           : activeTab === 1
-            ? setOpenToPickOrders(filteredArray)
-            : setAttemptedOrder(filteredArray);
+          ? setOpenToPickOrders(filteredArray)
+          : setAttemptedOrder(filteredArray);
       } else {
         return;
       }
@@ -268,10 +268,10 @@ const OrdersPage = (props: Props) => {
                   {index === 0
                     ? orders.length
                     : index === 1
-                      ? openToPickOrders.length
-                      : index === 2
-                        ? attemptedOrder.length
-                        : deliveredOrders.length}
+                    ? openToPickOrders.length
+                    : index === 2
+                    ? attemptedOrder.length
+                    : deliveredOrders.length}
                   )
                 </Text>
               </TouchableOpacity>
@@ -293,7 +293,7 @@ const OrdersPage = (props: Props) => {
               />
             }>
             {tabs.map((tab, index) => (
-              <View key={tab} style={{ width: screenWidth }}>
+              <View key={tab} style={{width: screenWidth}}>
                 <ScrollView contentContainerStyle={styles.contentContainer}>
                   {index === 0 && // Pending tab
                     (loading ? (
@@ -352,7 +352,7 @@ const OrdersPage = (props: Props) => {
                             handleAttemptedModal();
                             setSelectItem(item);
                           }}
-                        // type={'history'}
+                          // type={'history'}
                         />
                       ))
                     ) : (
@@ -471,8 +471,9 @@ const styles = StyleSheet.create({
   contentContainer: {
     paddingHorizontal: SIZES.wp(20 / 4.2),
     paddingTop: SIZES.wp(16 / 4.2),
+    paddingBottom: SIZES.wp(80 / 4.2),
     // backgroundColor: '#fff',
-    flex: 1,
+    // flex: 1,
   },
   activeTab: {
     borderColor: '#666666',

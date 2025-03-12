@@ -122,13 +122,15 @@ const HistoryItemCard = (props: Props) => {
           {props.type !== 'history' ? (
             <>
               {item.next_action === 'pickup' ? (
-                <Text style={styles.subText}>Ready to pickup</Text>
+                <Text style={[styles.subText, {color: '#B064F7'}]}>
+                  Ready to pickup
+                </Text>
               ) : (
                 <Text style={[styles.subText, {color: '#007DDC'}]}>
                   Ready to deliver
                 </Text>
               )}
-              <Text style={[styles.subText, {color: '#676767'}]}>
+              <Text style={[styles.subText, {color: '#FF8A3C'}]}>
                 {item.attempted_count} Attempt
               </Text>
             </>

@@ -16,10 +16,6 @@ const LABELS = [
     icon: <GreenRoundIcon />,
   },
   {
-    label: 'Attempted',
-    icon: <OrangeRoundIcon />,
-  },
-  {
     label: 'Pharmacy',
     icon: <BlueRoundIcon />,
   },
