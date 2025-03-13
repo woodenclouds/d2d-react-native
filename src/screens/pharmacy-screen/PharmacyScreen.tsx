@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   View,
   ActivityIndicator,
+  ScrollView,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import SafeAreaWrapper from '@app/components/SafeAreaWrapper';
@@ -50,7 +51,7 @@ const PharmacyScreen = () => {
         }}
         additionIconFunction={() => setModalVisible(true)}
       />
-      <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>
         {isLoading ? (
           <ActivityIndicator />
         ) : (
@@ -62,7 +63,7 @@ const PharmacyScreen = () => {
             </TouchableOpacity>
           )) || <Text>{error}</Text>
         )}
-      </View>
+      </ScrollView>
     </SafeAreaWrapper>
   );
 };
@@ -72,6 +73,6 @@ export default PharmacyScreen;
 const styles = StyleSheet.create({
   container: {
     padding: SIZES.wp(20 / 4.2),
-    gap: SIZES.wp(10 / 4.2),
+    paddingBottom: SIZES.wp(10 / 4.2),
   },
 });

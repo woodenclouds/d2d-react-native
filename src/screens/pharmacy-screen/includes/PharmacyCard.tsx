@@ -63,6 +63,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: SIZES.wp(16 / 4.2),
     gap: SIZES.wp(12 / 4.2),
+    marginBottom: SIZES.wp(12 / 4.2),
   },
   iconContainer: {
     width: SIZES.wp(48 / 4.2),
@@ -88,6 +89,7 @@ const styles = StyleSheet.create({
     color: '#272727',
     lineHeight: 24,
     marginBottom: 4,
+    width: '95%',
   },
   idText: {
     ...FONTS.regular,

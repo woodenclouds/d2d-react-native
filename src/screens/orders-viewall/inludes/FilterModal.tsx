@@ -57,10 +57,10 @@ const FilterModal = (props: Props) => {
       id: 2,
       type: 'Express',
     },
-    {
-      id: 3,
-      type: 'Bulk',
-    },
+    // {
+    //   id: 3,
+    //   type: 'Bulk',
+    // },
   ];
 
   return (
@@ -76,7 +76,7 @@ const FilterModal = (props: Props) => {
         options={pharmacies}
         placeholder="Select Pharmacy"
       />
-      <SelectBox
+      {/* <SelectBox
         label="Order Status"
         options={[
           'Pending',
@@ -87,7 +87,7 @@ const FilterModal = (props: Props) => {
         ]}
         placeholder="Choose Order Status"
         selected={setOrderStatus}
-      />
+      /> */}
       <View>
         <Text style={styles.labelText}>Delivery type</Text>
         <View style={styles.radioConainerStyle}>
@@ -186,6 +186,6 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.wp(16 / 4.2),
   },
   radioButtonStyle: {
-    width: '32%',
+    width: '48%',
   },
 });

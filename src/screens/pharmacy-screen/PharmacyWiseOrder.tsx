@@ -7,20 +7,20 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import SafeAreaWrapper from '@app/components/SafeAreaWrapper';
 import CommonHeader from '@app/components/CommonHeader';
 import FilterIcon from '@app/assets/icons/filter_icon.svg';
-import { navigate, navigateBack } from '@app/services/navigationService';
-import { FONTS, SIZE, SIZES } from '@app/themes/themes';
+import {navigate, navigateBack} from '@app/services/navigationService';
+import {FONTS, SIZE, SIZES} from '@app/themes/themes';
 import PharmacyCard from './includes/PharmacyCard';
 import HistoryItemCard from '../report-screen/includes/HistoryItemCard';
-import { assignedOrders, PharmacyWiseOrders } from '@app/services/api';
+import {assignedOrders, PharmacyWiseOrders} from '@app/services/api';
 import NoOrder from '@app/components/NoOrder';
 
-const { width: screenWidth } = Dimensions.get('window');
+const {width: screenWidth} = Dimensions.get('window');
 
-const PharmacyWiseOrder = ({ route }) => {
+const PharmacyWiseOrder = ({route}) => {
   const tabs = ['Pending', 'Picked', 'Attempted'];
   const [activeTab, setActiveTab] = useState(0);
   const contentScrollRef = useRef<ScrollView>(null);
@@ -112,7 +112,7 @@ const PharmacyWiseOrder = ({ route }) => {
         }}
         additionIconFunction={() => setModalVisible(true)}
       />
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         <PharmacyCard pharmacy={pharmacy} />
         <View style={styles.container}>
           <View style={styles.mainContainer}>
@@ -146,7 +146,7 @@ const PharmacyWiseOrder = ({ route }) => {
               showsHorizontalScrollIndicator={false}
               onMomentumScrollEnd={handleContentScroll}>
               {tabs.map((tab, index) => (
-                <View key={tab} style={{ width: screenWidth }}>
+                <View key={tab} style={{width: screenWidth}}>
                   <ScrollView contentContainerStyle={styles.contentContainer}>
                     {index === 0 && // Pending tab
                       (loading ? (
@@ -226,7 +226,7 @@ const PharmacyWiseOrder = ({ route }) => {
             </ScrollView>
           </View>
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaWrapper>
   );
 };
