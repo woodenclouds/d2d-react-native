@@ -107,6 +107,7 @@ const MapScreen = (props: Props) => {
         setMapLoader(false);
       })
       .catch(error => {
+        setMyLocation([0, 0]);
         const {code, message} = error;
         console.warn(code, message);
         setMapLoader(false);

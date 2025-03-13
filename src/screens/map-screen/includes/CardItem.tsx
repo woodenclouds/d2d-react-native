@@ -27,7 +27,6 @@ const width = SIZES.wp('100%');
 
 const CardItem = (props: Props) => {
   const { index, scrollX, currentIndex, onPressFunction, item } = props;
-  console.log(item, "card item map screen");
 
   const swipeAnimatedStyle = useAnimatedStyle(() => {
     return {
