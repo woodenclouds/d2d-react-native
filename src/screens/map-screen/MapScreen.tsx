@@ -305,7 +305,8 @@ const MapScreen = (props: Props) => {
               coordinate={{
                 latitude: order.latitude,
                 longitude: order.longitude,
-              }}>
+              }}
+              title={order.recepient_name}>
               <Image
                 source={
                   // order.is_pickup === true && order.next_action === 'pickup' ?
@@ -349,7 +350,8 @@ const MapScreen = (props: Props) => {
               coordinate={{
                 latitude: pharmacy?.location_data?.latitude,
                 longitude: pharmacy.location_data?.longitude,
-              }}>
+              }}
+              title={pharmacy.name}>
               <Image
                 source={bluePin}
                 style={{

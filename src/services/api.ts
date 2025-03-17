@@ -263,12 +263,12 @@ export const getAttendances = async () => {
   }
 };
 
-export const getPharmacies = async () => {
+export const getPharmacies = async (search: string) => {
   try {
     const token = await AsyncStorage.getItem('authToken');
     if (!token) throw new Error('User is not authenticated');
 
-    const response = await api.get('/accounts/pharmacies/', {
+    const response = await api.get(`/accounts/pharmacies/?q=` + search, {
       headers: {Authorization: `Bearer ${token}`},
     });
 

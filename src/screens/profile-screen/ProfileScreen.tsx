@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   Modal,
   Animated,
+  ScrollView,
 } from 'react-native';
 import React, {useEffect, useState, useRef} from 'react';
 import SafeAreaWrapper from '@app/components/SafeAreaWrapper';
@@ -106,14 +107,16 @@ const ProfileScreen = (props: Props) => {
         additionIconFunction={openMenu}
         icon={<ThreeDots />}
       />
-      <View style={styles.container}>
-        <View style={styles.topContainer}>
-          <View style={styles.imageContainer}></View>
-          <Text style={styles.nameText}>{profileDetails?.name}</Text>
-          <Text style={styles.idText}>ID : {profileDetails?.agent_id}</Text>
+      <ScrollView>
+        <View style={styles.container}>
+          <View style={styles.topContainer}>
+            <View style={styles.imageContainer}></View>
+            <Text style={styles.nameText}>{profileDetails?.name}</Text>
+            <Text style={styles.idText}>ID : {profileDetails?.agent_id}</Text>
+          </View>
         </View>
-      </View>
-      <TabItems data={profileDetails} attendances={attendances} />
+        <TabItems data={profileDetails} attendances={attendances} />
+      </ScrollView>
 
       {/* Small Corner Menu */}
       {menuVisible && (

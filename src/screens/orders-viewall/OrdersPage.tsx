@@ -283,18 +283,19 @@ const OrdersPage = (props: Props) => {
             pagingEnabled
             horizontal
             showsHorizontalScrollIndicator={false}
-            onMomentumScrollEnd={handleContentScroll}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={onRefresh}
-                colors={['#4A90E2']} // Customize refresh indicator color
-                progressBackgroundColor="#F5F7FA" // Background color of the refresh indicator
-              />
-            }>
+            onMomentumScrollEnd={handleContentScroll}>
             {tabs.map((tab, index) => (
               <View key={tab} style={{width: screenWidth}}>
-                <ScrollView contentContainerStyle={styles.contentContainer}>
+                <ScrollView
+                  contentContainerStyle={styles.contentContainer}
+                  refreshControl={
+                    <RefreshControl
+                      refreshing={refreshing}
+                      onRefresh={onRefresh}
+                      colors={['#4A90E2']} // Customize refresh indicator color
+                      progressBackgroundColor="#F5F7FA" // Background color of the refresh indicator
+                    />
+                  }>
                   {index === 0 && // Pending tab
                     (loading ? (
                       <ActivityIndicator size="large" color="#4A4D4E" />
