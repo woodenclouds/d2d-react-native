@@ -27,12 +27,14 @@ import BellIcon from '@app/assets/icons/bell_icon.svg';
 import TickWithSparkle from '@app/assets/icons/tick_with_sparkle.svg';
 import CardBoard from '@app/assets/icons/card_board.svg';
 import ArrowRight from '@app/assets/icons/arrow_right.svg';
+import TaskIcon from '@app/assets/icons/task.svg';
 
 import {useAuth} from '../../context/AuthContext';
 import {assignedOrders, orderReports} from '@app/services/api';
 import OrderDetailsUpdateModal from '../map-screen/includes/OrderDetailsUpdateModal';
 import NoOrder from '@app/components/NoOrder';
 import { useFocusEffect } from '@react-navigation/native';
+import HomeCard from './includes/HomeCard';
 
 type Props = {};
 
@@ -41,15 +43,11 @@ const HomeScreen = (props: Props) => {
   const [signIn, setSignIn] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const {checkIn, checkOut, state, resetOrderDetailsUpdated} = useAuth();
-  const {checkInId, tempItem} = state;
-
-  console.log(tempItem);
-
+  const {checkInId, tempItem, role} = state;
+  
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  console.log(orders, 'orders');
 
   const [reports, setReports] = useState([]);
   const [orderReportLoading, setOrderReportLoading] = useState(true);
@@ -242,7 +240,7 @@ const HomeScreen = (props: Props) => {
               setModalVisible={setModalVisible}
             />
 
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={styles.pharmacy}
               onPress={() => {
                 navigate('PharmacyScreen', {});
@@ -255,7 +253,12 @@ const HomeScreen = (props: Props) => {
                   height={SIZES.wp(18 / 4.2)}
                 />
               </View>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
+
+            <View style={styles.homeCardRow}>
+              <HomeCard title="Pharmacy wise orders" Icon={CardBoard} onPress={() => navigate('PharmacyScreen', {})} />
+              {role === 'delivery-agent' && <HomeCard title="Pending Assigns" Icon={TaskIcon} onPress={() => navigate('PendingAssigns', {})} />}
+            </View>
 
             <View style={styles.rowfullView}>
               <Text style={styles.titleText}>New Orders</Text>
@@ -411,4 +414,12 @@ const styles = StyleSheet.create({
   noOrdersContainer: {
     paddingTop: SIZES.wp(20 / 4.2),
   },
+  homeCardRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: SIZES.wp(16 / 4.2),
+    paddingHorizontal: SIZES.wp(20 / 4.2),
+    columnGap: SIZES.wp(10 / 4.2),
+  }
 });

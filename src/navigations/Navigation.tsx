@@ -13,13 +13,12 @@ import {useAuth} from '../context/AuthContext';
 import {ActivityIndicator, View} from 'react-native';
 import PharmacyScreen from '@app/screens/pharmacy-screen/PharmacyScreen';
 import PharmacyWiseOrder from '@app/screens/pharmacy-screen/PharmacyWiseOrder';
+import PendingAssigns from '@app/screens/pending-assigns-screen/PendingAssigns';
 
 const Navigation = () => {
   const Stack = createNativeStackNavigator<RootStackType>();
   const {state} = useAuth();
   const {authToken, loading} = state;
-
-  console.log('authToken', authToken);
 
   // Show loading indicator while checking auth state
   if (loading) {
@@ -48,6 +47,7 @@ const Navigation = () => {
         <Stack.Screen name={'OrdersPage'} component={OrdersPage} />
         <Stack.Screen name={'PharmacyScreen'} component={PharmacyScreen} />
         <Stack.Screen name={'PharmacyWiseOrder'} component={PharmacyWiseOrder} />
+        <Stack.Screen name={'PendingAssigns'} component={PendingAssigns} />
       </Stack.Navigator>
     </React.Fragment>
   );

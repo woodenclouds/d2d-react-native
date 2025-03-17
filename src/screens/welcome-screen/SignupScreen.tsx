@@ -34,7 +34,7 @@ const ModalInner = (props: ModalInnertProps) => {
       setIsLoading(true);
       console.log('Attempting login with email:', email); // Debug log
       const loginResult = await login(email, password); // Get the result
-
+      console.log('Login result:', loginResult); // Debug log
       // Validate the result (ensure it contains expected fields)
       if (!loginResult || !loginResult.access || !loginResult.userId) {
         throw new Error('Login failed: Invalid response from server');

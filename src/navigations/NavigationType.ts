@@ -13,4 +13,5 @@ export type RootStackType = {
   OrdersPage: undefined;
   PharmacyScreen: undefined;
   PharmacyWiseOrder: undefined;
+  PendingAssigns: undefined;
 };
