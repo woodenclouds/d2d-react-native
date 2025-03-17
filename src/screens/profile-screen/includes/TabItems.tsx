@@ -59,7 +59,7 @@ const TabItems = (props: Props) => {
             </Text>
           </TouchableOpacity>
         </View>
-        <ScrollView style={styles.scrollContainer}>
+        <View style={styles.scrollContainer}>
           {activeTab === 0
             ? personalData.map(item => (
                 <ItemCard label={item.label} valueText={item.value} />
@@ -74,7 +74,7 @@ const TabItems = (props: Props) => {
                   loginLogout={item?.chekin_nd_chekout_time}
                 />
               ))}
-        </ScrollView>
+        </View>
       </View>
     </View>
   );
@@ -87,6 +87,7 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: SIZES.wp(20 / 4.2),
     marginTop: SIZES.wp(16 / 4.2),
+    marginBottom: SIZES.wp(100 / 4.2),
   },
   mainContainer: {
     backgroundColor: '#fff',
@@ -114,6 +115,5 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     marginTop: SIZES.wp(16 / 4.2),
-    height: SIZES.wp(400 / 4.2),
   },
 });

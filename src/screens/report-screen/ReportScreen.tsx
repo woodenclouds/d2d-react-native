@@ -6,24 +6,24 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import SafeAreaWrapper from '@app/components/SafeAreaWrapper';
 import CommonHeader from '@app/components/CommonHeader';
 import TopCardItem from '../report-screen/includes/TopCardItem';
 import HistoryItemCard from './includes/HistoryItemCard';
-import { SIZES, FONTS } from '@app/themes/themes';
+import {SIZES, FONTS} from '@app/themes/themes';
 import ReportIcon from '@app/assets/icons/report_icon_blue.svg';
 import DollarIcon from '@app/assets/icons/dollar_icon.svg';
 import SearchIcon from '@app/assets/icons/search_icon.svg';
-import { assignedOrders, orderHistory, orderReports } from '@app/services/api';
-import { useAuth } from '../../context/AuthContext';
+import {assignedOrders, orderHistory, orderReports} from '@app/services/api';
+import {useAuth} from '../../context/AuthContext';
 import NoOrder from '@app/components/NoOrder';
 
 type Props = {};
 
 const ReportScreen = (props: Props) => {
-  const { checkIn, checkOut, state } = useAuth();
-  const { checkInId } = state;
+  const {checkIn, checkOut, state} = useAuth();
+  const {checkInId} = state;
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -81,7 +81,7 @@ const ReportScreen = (props: Props) => {
             totalDeliveries={reports?.total_deliveries}
             containerStyle={{
               ...styles.containerStyle,
-              ...{ backgroundColor: '#F5E2C4' },
+              ...{backgroundColor: '#F5E2C4'},
             }}
             label={'Payments collected'}
             icon={<DollarIcon />}
@@ -89,12 +89,12 @@ const ReportScreen = (props: Props) => {
         </View>
         <View style={styles.fullWidthRowView}>
           <Text style={styles.historyHeading}>History</Text>
-          <TouchableOpacity style={styles.rowView}>
+          {/* <TouchableOpacity style={styles.rowView}>
             <View>
               <SearchIcon />
             </View>
             <Text style={styles.searchText}>Search</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         {loading ? (
           <ActivityIndicator size="large" color="#007bff" />
