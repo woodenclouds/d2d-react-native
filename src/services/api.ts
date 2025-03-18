@@ -29,8 +29,6 @@ export const loginUser = async (email: string, password: string) => {
       password,
     });
 
-    console.log(response.data);
-
     if (response.data.StatusCode === 6000) {
       const {access, refresh} = response.data.data.response;
       const userId = response.data.data.user_id;
@@ -106,6 +104,47 @@ export const leaveRequest = async (reason: string, start_date: string) => {
   }
 };
 
+export const deliveryAgents = async () => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    if (!token) throw new Error('User is not authenticated');
+
+    const response = await api.get(
+      '/accounts/delivery-agents/',
+      {
+        headers: {Authorization: `Bearer ${token}`},
+      },
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error('Delivery agents failed:', error);
+    throw error;
+  }
+};
+
+export const assignDriver = async (agent_id: any, orderid: any) => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    if (!token) throw new Error('User is not authenticated');
+
+    const response = await api.post(
+      `/orders/assign/delivery-agent/${orderid}/`,
+      {
+        delivery_agent: agent_id,
+      },
+      {
+        headers: {Authorization: `Bearer ${token}`},
+      },
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error('Assign driver failed:', error);
+    throw error;
+  }
+};
+
 export const assignedOrders = async () => {
   try {
     const token = await AsyncStorage.getItem('authToken');
@@ -131,7 +170,7 @@ export const unassignedOrders = async () => {
     if (!token) throw new Error('User is not authenticated');
 
     const response = await api.get(
-      '/orders/delivery-agent/orders/?status=ready_to_dispatch',
+      '/orders/?status=ready_to_dispatch',
       {
         headers: {Authorization: `Bearer ${token}`},
       },

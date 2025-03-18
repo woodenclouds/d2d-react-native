@@ -83,6 +83,6 @@ const styles = StyleSheet.create({
     width: '95%',
     alignSelf: 'center',
     paddingHorizontal: SIZES.wp(16 / 4.2),
-    paddingVertical: SIZES.wp(40 / 4.2),
+    paddingVertical: SIZES.wp(20 / 4.2),
   },
 });

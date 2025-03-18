@@ -195,8 +195,6 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         },
       });
 
-      console.log(result, 'result');
-
       return result; // Return the result to allow further validation
     } catch (error) {
       console.error('AuthContext Login Error:', error.message);

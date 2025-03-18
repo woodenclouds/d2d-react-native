@@ -30,7 +30,6 @@ type Props = {
 
 const HistoryItemCard = (props: Props) => {
   const { item, onAttemptPress } = props;
-  console.log(item, 'item');
 
   const arrowDegree = useSharedValue('0deg');
   const animateHight = useSharedValue(0);

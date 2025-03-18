@@ -5,21 +5,25 @@ import {
   Text,
   View,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import SafeAreaWrapper from '@app/components/SafeAreaWrapper';
-import {navigateBack} from '@app/services/navigationService';
+import { navigateBack } from '@app/services/navigationService';
 import CommonHeader from '@app/components/CommonHeader';
 import SearchIcon from '@app/assets/icons/search_icon.svg';
 import PendingAssignCard from './includes/PendingAssignCard';
-import {SIZES} from '@app/themes/themes';
+import { SIZES } from '@app/themes/themes';
 
-import {unassignedOrders} from '@app/services/api';
+import { unassignedOrders } from '@app/services/api';
 import NoOrder from '@app/components/NoOrder';
+import BottomModal from '@app/components/BottomModal';
+import AssignDriverModal from './includes/AssignDriverModal';
 
 const PendingAssigns = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   const fetchUnassignedOrders = async () => {
     try {
@@ -32,11 +36,11 @@ const PendingAssigns = () => {
       setLoading(false);
     }
   };
-
+  
   useEffect(() => {
     fetchUnassignedOrders();
 
-    return () => {};
+    return () => { };
   }, []);
 
   return (
@@ -49,7 +53,7 @@ const PendingAssigns = () => {
         backPress={() => {
           navigateBack();
         }}
-        // additionIconFunction={handleSearchToggle}
+      // additionIconFunction={handleSearchToggle}
       />
       <ScrollView style={styles.container}>
         {loading ? (
@@ -62,10 +66,12 @@ const PendingAssigns = () => {
           </View>
         ) : (
           orders.map((order, index) => (
-            <PendingAssignCard data={order} key={index} />
+            <PendingAssignCard data={order} key={index} setModalVisible={setModalVisible} setSelectedOrder={setSelectedOrder}/>
           ))
         )}
       </ScrollView>
+      <BottomModal isVisible={modalVisible} setVisible={setModalVisible} children={<AssignDriverModal orderId={selectedOrder?.id} setModalVisible={setModalVisible} fetchUnassignedOrders={fetchUnassignedOrders}/>} />
+
     </SafeAreaWrapper>
   );
 };
