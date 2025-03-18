@@ -33,7 +33,7 @@ import {useAuth} from '../../context/AuthContext';
 import {assignedOrders, orderReports} from '@app/services/api';
 import OrderDetailsUpdateModal from '../map-screen/includes/OrderDetailsUpdateModal';
 import NoOrder from '@app/components/NoOrder';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 import HomeCard from './includes/HomeCard';
 
 type Props = {};
@@ -43,8 +43,8 @@ const HomeScreen = (props: Props) => {
   const [signIn, setSignIn] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const {checkIn, checkOut, state, resetOrderDetailsUpdated} = useAuth();
-  const {checkInId, tempItem, role} = state;
-  
+  const {checkInId, tempItem, role, is_delivery_manager} = state;
+
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -256,8 +256,18 @@ const HomeScreen = (props: Props) => {
             </TouchableOpacity> */}
 
             <View style={styles.homeCardRow}>
-              <HomeCard title="Pharmacy wise orders" Icon={CardBoard} onPress={() => navigate('PharmacyScreen', {})} />
-              {role === 'delivery-agent' && <HomeCard title="Pending Assigns" Icon={TaskIcon} onPress={() => navigate('PendingAssigns', {})} />}
+              <HomeCard
+                title="Pharmacy wise orders"
+                Icon={CardBoard}
+                onPress={() => navigate('PharmacyScreen', {})}
+              />
+              {is_delivery_manager && (
+                <HomeCard
+                  title="Pending Assigns"
+                  Icon={TaskIcon}
+                  onPress={() => navigate('PendingAssigns', {})}
+                />
+              )}
             </View>
 
             <View style={styles.rowfullView}>
@@ -421,5 +431,5 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.wp(16 / 4.2),
     paddingHorizontal: SIZES.wp(20 / 4.2),
     columnGap: SIZES.wp(10 / 4.2),
-  }
+  },
 });

@@ -10,6 +10,7 @@ interface AuthState {
   userId: number | null;
   role: string | null;
   name: string | null;
+  is_delivery_manager: boolean;
   loading: boolean;
   error: string | null;
   checkInStatus: boolean;
@@ -32,6 +33,7 @@ type AuthAction =
         userId: number;
         role: string;
         name: string;
+        is_delivery_manager: boolean;
       };
     }
   | {type: 'SET_ERROR'; payload: string}
@@ -56,6 +58,7 @@ const initialState: AuthState = {
   userId: null,
   role: null,
   name: null,
+  is_delivery_manager: false,
   loading: true,
   error: null,
   checkInStatus: false,
@@ -79,6 +82,7 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
         userId: action.payload.userId,
         role: action.payload.role,
         name: action.payload.name,
+        is_delivery_manager: action.payload.is_delivery_manager,
         loading: false,
         error: null,
       };
@@ -133,9 +137,19 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         const userId = await AsyncStorage.getItem('userId');
         const role = await AsyncStorage.getItem('userRole');
         const name = await AsyncStorage.getItem('userName');
+        const is_delivery_manager = await AsyncStorage.getItem(
+          'isDeliveryManager',
+        );
         const checkInId = await AsyncStorage.getItem('checkInId');
 
-        if (authToken && refreshToken && userId && role && name) {
+        if (
+          authToken &&
+          refreshToken &&
+          userId &&
+          role &&
+          name &&
+          is_delivery_manager
+        ) {
           axios.defaults.headers.common[
             'Authorization'
           ] = `Bearer ${authToken}`;
@@ -147,6 +161,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
               userId: parseInt(userId, 10),
               role,
               name,
+              is_delivery_manager: is_delivery_manager === 'true',
             },
           });
 
@@ -176,8 +191,12 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
           userId: result.userId,
           role: result.role,
           name: result.name,
+          is_delivery_manager: result.is_delivery_manager,
         },
       });
+
+      console.log(result, 'result');
+
       return result; // Return the result to allow further validation
     } catch (error) {
       console.error('AuthContext Login Error:', error.message);

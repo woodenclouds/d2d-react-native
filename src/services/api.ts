@@ -36,6 +36,7 @@ export const loginUser = async (email: string, password: string) => {
       const userId = response.data.data.user_id;
       const role = response.data.data.role;
       const name = response.data.data.name;
+      const is_delivery_manager = response.data.data.is_delivery_manager;
 
       // Store tokens in AsyncStorage
       await AsyncStorage.setItem('authToken', access);
@@ -43,11 +44,15 @@ export const loginUser = async (email: string, password: string) => {
       await AsyncStorage.setItem('userId', userId.toString());
       await AsyncStorage.setItem('userRole', role);
       await AsyncStorage.setItem('userName', name);
+      await AsyncStorage.setItem(
+        'isDeliveryManager',
+        is_delivery_manager.toString(),
+      );
 
       // Set Authorization header for future requests
       api.defaults.headers.common['Authorization'] = `Bearer ${access}`;
 
-      return {access, refresh, userId, role, name};
+      return {access, refresh, userId, role, name, is_delivery_manager};
     } else {
       throw new Error('Invalid login credentials');
     }
@@ -108,6 +113,25 @@ export const assignedOrders = async () => {
 
     const response = await api.get(
       '/orders/delivery-agent/orders/?order_type=assigned&is_delivered=false',
+      {
+        headers: {Authorization: `Bearer ${token}`},
+      },
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error('Assigned orders failed:', error);
+    throw error;
+  }
+};
+
+export const unassignedOrders = async () => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    if (!token) throw new Error('User is not authenticated');
+
+    const response = await api.get(
+      '/orders/delivery-agent/orders/?status=ready_to_dispatch',
       {
         headers: {Authorization: `Bearer ${token}`},
       },
