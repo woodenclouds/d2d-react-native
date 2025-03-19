@@ -5,6 +5,7 @@ import Divider from '@app/components/Divider';
 import violetBoxPin from '@app/assets/images/violet_box_pin.png';
 import violetPin from '@app/assets/images/violet_pin.png';
 import Button from '@app/components/Button';
+import { convertToAMPM, formatDate } from '@app/utils/dateTime';
 
 interface PendingAssignCardProps {
     data: any;
@@ -18,11 +19,11 @@ const PendingAssignCard = ({ data, setModalVisible, setSelectedOrder }: PendingA
         setModalVisible(true);
         setSelectedOrder(data);
     };
-    
+
     return (
         <View style={styles.container}>
             <View style={styles.nameRow}>
-                <Image source={violetPin} style={styles.icon} />
+                {data?.is_pickup ? <Image source={violetBoxPin} style={styles.icon} /> : <Image source={violetPin} style={styles.icon} />}
                 <View>
                     <Text style={styles.titleText}>{data.pharmacy}</Text>
                     <Text style={styles.idText} numberOfLines={1}>
@@ -35,8 +36,8 @@ const PendingAssignCard = ({ data, setModalVisible, setSelectedOrder }: PendingA
             </View>
             <Divider color="#F5F7FA" marginVertical={0} />
             <View style={styles.ordersRow}>
-                <Text style={styles.ordersText}>Delivery Date: 15/02/2025</Text>
-                <Text style={styles.ordersText}>2PM - 4PM</Text>
+                <Text style={styles.ordersText}>Delivery Date: {formatDate(data.delivery_date)}</Text>
+                <Text style={styles.ordersText}>{convertToAMPM(data.from_time)} - {convertToAMPM(data.to_time)}</Text>
             </View>
         </View>
     );
@@ -110,7 +111,7 @@ const styles = StyleSheet.create({
         marginRight: 4,
     },
     icon: {
-        width: SIZES.wp(25 / 4.2),
+        width: SIZES.wp(28 / 4.2),
         height: SIZES.hp(25 / 4.2),
     },
 });

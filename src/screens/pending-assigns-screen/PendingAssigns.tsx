@@ -1,11 +1,13 @@
 import {
   ActivityIndicator,
+  FlatList,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import SafeAreaWrapper from '@app/components/SafeAreaWrapper';
 import { navigateBack } from '@app/services/navigationService';
 import CommonHeader from '@app/components/CommonHeader';
@@ -21,27 +23,95 @@ import AssignDriverModal from './includes/AssignDriverModal';
 const PendingAssigns = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [refreshing, setRefreshing] = useState(false); // State for refresh control
 
-  const fetchUnassignedOrders = async () => {
+  // Pagination state
+  const [pagination, setPagination] = useState({
+    current_page: 1,
+    next: null,
+    page_size: 20,
+    previous: null,
+    total_items: 0,
+    total_pages: 1
+  });
+
+  const fetchUnassignedOrders = async (page = 1, shouldAppend = false) => {
     try {
-      const data = await unassignedOrders();
-      setOrders(data.data || []);
-      setLoading(false);
+      if (page === 1) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
+      const data = await unassignedOrders(page);
+      console.log(data, 'data');
+      if (shouldAppend && page > 1) {
+        setOrders(prevOrders => [...prevOrders, ...(data.data || [])]);
+      } else {
+        setOrders(data.data || []);
+      }
+
+      if (data.pagination) {
+        setPagination(data.pagination);
+      }
     } catch (err) {
-      //   console.log(err);
+      console.error(err);
       setError('Failed to load orders');
+    } finally {
       setLoading(false);
+      setLoadingMore(false);
+      setRefreshing(false);
     }
   };
-  
+
   useEffect(() => {
     fetchUnassignedOrders();
-
     return () => { };
   }, []);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchUnassignedOrders(1, false);
+  }
+
+  const loadMoreOrders = useCallback(() => {
+    if (!loadingMore && pagination.next) {
+      fetchUnassignedOrders(pagination.current_page + 1, true);
+    }
+  }, [loadingMore, pagination.next, pagination.current_page]);
+
+  const renderFooter = () => {
+    if (!loadingMore) return null;
+
+    return (
+      <View style={styles.footerLoader}>
+        <ActivityIndicator size="small" color="#007bff" />
+      </View>
+    );
+  };
+
+  const renderItem = ({ item, index }: { item: any; index: number }) => (
+    <PendingAssignCard
+      data={item}
+      key={index}
+      setModalVisible={setModalVisible}
+      setSelectedOrder={setSelectedOrder}
+    />
+  );
+
+  const ListEmptyComponent = () => {
+    if (loading) return null;
+
+    return (
+      <View style={styles.noOrdersContainer}>
+        <NoOrder message="No orders assigned yet, stay ready for the next delivery!" />
+      </View>
+    );
+  };
+
 
   return (
     <SafeAreaWrapper backgroundColor="#F5F7FA" barStyle="dark-content">
@@ -55,22 +125,30 @@ const PendingAssigns = () => {
         }}
       // additionIconFunction={handleSearchToggle}
       />
-      <ScrollView style={styles.container}>
-        {loading ? (
+
+      {loading && !refreshing ? (
+        <View style={styles.loaderContainer}>
           <ActivityIndicator size="large" color="#007bff" />
-        ) : error ? (
+        </View>
+      ) : error ? (
+        <View style={styles.errorContainer}>
           <Text style={styles.error}>{error}</Text>
-        ) : orders.length === 0 ? (
-          <View style={styles.noOrdersContainer}>
-            <NoOrder message="No orders assigned yet, stay ready for the next delivery!" />
-          </View>
-        ) : (
-          orders.map((order, index) => (
-            <PendingAssignCard data={order} key={index} setModalVisible={setModalVisible} setSelectedOrder={setSelectedOrder}/>
-          ))
-        )}
-      </ScrollView>
-      <BottomModal isVisible={modalVisible} setVisible={setModalVisible} children={<AssignDriverModal orderId={selectedOrder?.id} setModalVisible={setModalVisible} fetchUnassignedOrders={fetchUnassignedOrders}/>} />
+        </View>
+      ) : (
+        <FlatList
+          data={orders}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => `${item.id || index}`}
+          contentContainerStyle={styles.listContainer}
+          ListEmptyComponent={ListEmptyComponent}
+          ListFooterComponent={renderFooter}
+          onEndReached={loadMoreOrders}
+          onEndReachedThreshold={0.3}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          />
+      )}
+      <BottomModal isVisible={modalVisible} setVisible={setModalVisible} children={<AssignDriverModal orderId={selectedOrder?.id} setModalVisible={setModalVisible} fetchUnassignedOrders={fetchUnassignedOrders} />} />
 
     </SafeAreaWrapper>
   );
@@ -79,9 +157,21 @@ const PendingAssigns = () => {
 export default PendingAssigns;
 
 const styles = StyleSheet.create({
-  container: {
+  listContainer: {
     paddingHorizontal: SIZES.wp(20 / 4.2),
     paddingVertical: SIZES.wp(11 / 4.2),
+    flexGrow: 1,
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: SIZES.wp(20 / 4.2),
   },
   noOrdersContainer: {
     paddingTop: SIZES.wp(20 / 4.2),
@@ -90,8 +180,8 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: 16,
   },
-  noOrders: {
-    fontSize: 16,
-    fontStyle: 'italic',
+  footerLoader: {
+    paddingVertical: SIZES.wp(20 / 4.2),
+    alignItems: 'center',
   },
 });

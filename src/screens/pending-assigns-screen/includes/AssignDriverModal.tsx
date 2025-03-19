@@ -86,6 +86,8 @@ const AssignDriverModal = ({ orderId, setModalVisible, fetchUnassignedOrders }: 
                         data={deliveryAgentsData}
                         labelField="name"
                         valueField="id"
+                        search
+                        searchPlaceholder="Search drivers"
                         placeholder={!isFocus ? 'Select drivers' : '...'}
                         value={value}
                         onFocus={() => {
@@ -101,14 +103,12 @@ const AssignDriverModal = ({ orderId, setModalVisible, fetchUnassignedOrders }: 
                             setIsFocus(false);
                             setIsOpen(false);
                         }}
-                        dropdownPosition="auto"
-                        maxHeight={200}
+                        dropdownPosition="bottom"
+                        maxHeight={300}
                     />
                 </View>
-                {/* Add spacer when dropdown is open */}
-                {isOpen && <View style={{ height: SIZES.wp(200 / 4.2) }} />}
                 <View>
-                    <Button label='Assign' buttonStyle={{ marginTop: 0 }} onPressFunction={handleAssign} loading={loading}/>
+                    <Button label='Assign' buttonStyle={isOpen ? { marginTop: 300 } : { marginTop: 0 }} onPressFunction={handleAssign} loading={loading}/>
                 </View>
             </View>
         </View>

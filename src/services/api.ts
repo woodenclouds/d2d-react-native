@@ -164,13 +164,13 @@ export const assignedOrders = async () => {
   }
 };
 
-export const unassignedOrders = async () => {
+export const unassignedOrders = async (page: number = 1) => {
   try {
     const token = await AsyncStorage.getItem('authToken');
     if (!token) throw new Error('User is not authenticated');
 
     const response = await api.get(
-      '/orders/?status=ready_to_dispatch',
+      `/orders/?status=ready_to_dispatch&page=${page}`,
       {
         headers: {Authorization: `Bearer ${token}`},
       },
