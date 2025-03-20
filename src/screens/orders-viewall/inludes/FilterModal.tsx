@@ -1,11 +1,11 @@
-import {StyleSheet, Text, View} from 'react-native';
-import React, {useState, useEffect} from 'react';
-import {COLORS, FONTS, SIZES} from '@app/themes/themes';
+import { StyleSheet, Text, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { COLORS, FONTS, SIZES } from '@app/themes/themes';
 import Button from '@app/components/Button';
 import FilterIcon from '@app/assets/icons/filter_icon.svg';
 import SelectBox from '@app/components/SelectBox';
 import CommonRadioButton from '@app/components/CommonRadioButton';
-import {getPharmacies} from '@app/services/api';
+import { getPharmacies } from '@app/services/api';
 
 type Props = {
   isVisible: boolean;
@@ -19,7 +19,7 @@ type Props = {
 };
 
 const FilterModal = (props: Props) => {
-  const {setVisible, isVisible, onPressFunction, activeTab} = props;
+  const { setVisible, isVisible, onPressFunction, activeTab } = props;
   // const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [deliveryType, setDeliveryType] = useState('Normal');
   const [pharmacies, setPharmacies] = useState([]);
@@ -30,7 +30,7 @@ const FilterModal = (props: Props) => {
   const fetchPharmacies = async () => {
     try {
       const data = await getPharmacies(); // Call API
-      const companies = data.data.map(item => item.company_name);
+      const companies = data.data.map(item => ({ name: item.company_name }));
       setPharmacy(data.data);
       setPharmacies(companies);
     } catch (err) {
@@ -66,7 +66,7 @@ const FilterModal = (props: Props) => {
   return (
     <View style={[styles.container]}>
       <View style={styles.smallDash}></View>
-      <View style={[styles.rowViewSpace, {justifyContent: 'flex-start'}]}>
+      <View style={[styles.rowViewSpace, { justifyContent: 'flex-start' }]}>
         <FilterIcon />
         <Text style={styles.filterHeading}>Filter</Text>
       </View>
@@ -179,6 +179,7 @@ const styles = StyleSheet.create({
     fontSize: SIZES.wp(14 / 4.2),
     color: '#747474',
     marginBottom: SIZES.wp(8 / 4.2),
+    marginTop: SIZES.wp(20 / 4.2),
   },
   radioConainerStyle: {
     flexDirection: 'row',
