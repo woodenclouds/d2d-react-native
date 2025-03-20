@@ -24,7 +24,7 @@ const PendingAssignCard = ({ data, setModalVisible, setSelectedOrder }: PendingA
         <View style={styles.container}>
             <View style={styles.nameRow}>
                 {data?.is_pickup ? <Image source={violetBoxPin} style={styles.icon} /> : <Image source={violetPin} style={styles.icon} />}
-                <View>
+                <View style={{ width: 150}}>
                     <Text style={styles.titleText}>{data.pharmacy}</Text>
                     <Text style={styles.idText} numberOfLines={1}>
                         {data.location}
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
         fontSize: SIZES.wp(14 / 4.2),
         color: '#676767',
         lineHeight: 20,
-        width: SIZES.wp(180 / 4.2),
+        // width: SIZES.wp(180 / 4.2),
     },
     ordersText: {
         ...FONTS.regular,

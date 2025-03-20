@@ -1,5 +1,5 @@
-import { StyleSheet, Text, ToastAndroid, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { Alert, Animated, StyleSheet, Text, ToastAndroid, View } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
 import { COLORS, FONTS, SIZES } from '@app/themes/themes'
 import Divider from '@app/components/Divider'
 import Button from '@app/components/Button'
@@ -34,27 +34,7 @@ const AssignDriverModal = ({ orderId, setModalVisible, fetchUnassignedOrders }: 
     useEffect(() => {
         fetchDeliveryAgents();
     }, []);
-
-    const handleAssign = async () => {
-        if (!value) {
-            return;
-        }
-        try {
-            setLoading(true);
-            const response = await assignDriver(value, orderId);
-            if (response.StatusCode === 6000) {
-                showToast();
-                setValue(null);
-                setModalVisible(false);
-                fetchUnassignedOrders();
-            }
-        } catch (err) {
-            console.log(err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
+    
     const CustomToast = () => {
         return (
             <View style={styles.customToast}>
@@ -69,15 +49,40 @@ const AssignDriverModal = ({ orderId, setModalVisible, fetchUnassignedOrders }: 
         });
     };
 
+    const handleAssign = async () => {
+        if (!value) {
+            Alert.alert('Alert', 'Please select a driver');
+            return;
+        }
+        try {
+            setLoading(true);
+            const response = await assignDriver(value, orderId);
+            if (response.StatusCode === 6000) {
+                showToast();
+                setValue(null);
+                setModalVisible(false);
+                fetchUnassignedOrders();
+            } else {
+                Alert.alert('Alert', 'Failed to assign driver');
+            }
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
     return (
-        <View>
+        <View >
             <View style={styles.smallDash} />
             <View style={styles.container}>
                 <View>
                     <Text style={styles.titleText}>Assign Driver</Text>
                 </View>
                 <Divider color='#DFDFDF' marginVertical={24} />
-                <View style={styles.dropdownContainer}>
+
+                <View style={[styles.dropdownContainer, isOpen && { marginBottom: 300 }]}>
                     <Text style={styles.dropdownText}>Drivers</Text>
                     <Dropdown
                         style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
@@ -86,8 +91,8 @@ const AssignDriverModal = ({ orderId, setModalVisible, fetchUnassignedOrders }: 
                         data={deliveryAgentsData}
                         labelField="name"
                         valueField="id"
-                        search
-                        searchPlaceholder="Search drivers"
+                        // search
+                        // searchPlaceholder="Search drivers"
                         placeholder={!isFocus ? 'Select drivers' : '...'}
                         value={value}
                         onFocus={() => {
@@ -107,9 +112,12 @@ const AssignDriverModal = ({ orderId, setModalVisible, fetchUnassignedOrders }: 
                         maxHeight={300}
                     />
                 </View>
-                <View>
-                    <Button label='Assign' buttonStyle={isOpen ? { marginTop: 300 } : { marginTop: 0 }} onPressFunction={handleAssign} loading={loading}/>
-                </View>
+                <Button
+                    label='Assign'
+                    buttonStyle={{ marginTop: 0 }}
+                    onPressFunction={handleAssign}
+                    loading={loading}
+                />
             </View>
         </View>
     )
@@ -137,15 +145,18 @@ const styles = StyleSheet.create({
         fontSize: SIZES.wp(14 / 4.2),
         color: '#676767',
         lineHeight: 18,
+        marginBottom: SIZES.wp(12 / 4.2),
     },
     container: {
         // Add a minHeight to ensure content is visible
         // minHeight: SIZES.wp(180 / 4.2),
+        // flex: 1,
+        // height: SIZES.wp(300 / 4.2),
+        // justifyContent: 'space-between',
+
     },
     content: {
-        // minHeight: SIZES.wp(180 / 4.2),
-
-
+        // minHeight: SIZES.wp(180 / 4.2)
     },
     dropdown: {
         height: 50,
@@ -169,7 +180,6 @@ const styles = StyleSheet.create({
     },
     dropdownContainer: {
         marginBottom: SIZES.wp(50 / 4.2),
-        rowGap: SIZES.wp(8 / 4.2),
         zIndex: 1000,
     },
 

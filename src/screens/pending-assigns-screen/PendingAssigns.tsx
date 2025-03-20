@@ -19,6 +19,7 @@ import { unassignedOrders } from '@app/services/api';
 import NoOrder from '@app/components/NoOrder';
 import BottomModal from '@app/components/BottomModal';
 import AssignDriverModal from './includes/AssignDriverModal';
+import CenterModalBox from '@app/components/CenterModalBox';
 
 const PendingAssigns = () => {
   const [orders, setOrders] = useState([]);
@@ -148,7 +149,17 @@ const PendingAssigns = () => {
           onRefresh={onRefresh}
           />
       )}
-      <BottomModal isVisible={modalVisible} setVisible={setModalVisible} children={<AssignDriverModal orderId={selectedOrder?.id} setModalVisible={setModalVisible} fetchUnassignedOrders={fetchUnassignedOrders} />} />
+      <BottomModal
+        isVisible={modalVisible}
+        setVisible={setModalVisible}
+        children={
+          <AssignDriverModal
+            orderId={selectedOrder?.id}
+            setModalVisible={setModalVisible}
+            fetchUnassignedOrders={fetchUnassignedOrders}
+          />
+        }
+      />
 
     </SafeAreaWrapper>
   );
