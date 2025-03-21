@@ -13,10 +13,14 @@ import DownArrow from '@app/assets/icons/down_arrow.svg';
 type Props = {
   label?: string;
   placeholder?: string;
-  options?: string[];
+  options?: { name: string; id: string }[];
   onDropdownToggle?: (value: boolean) => void;
   selected?: (value: string) => void;
-  boxType?: 'default' | 'withSearch'; // New prop for box type
+  boxType?: 'default' | 'withSearch';
+  onEndReached?: () => void;
+  hasMore?: boolean;
+  loadingMore?: boolean;
+  onSearch?: (query: string) => void;
 };
 
 const SelectBox = (props: Props) => {
@@ -27,23 +31,20 @@ const SelectBox = (props: Props) => {
     onDropdownToggle,
     selected,
     boxType = 'default',
+    onEndReached,
+    hasMore = false,
+    loadingMore = false,
+    onSearch,
   } = props;
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(placeholder);
-  const [searchText, setSearchText] = useState(''); // State for search input
-  const [filteredOptions, setFilteredOptions] = useState(options); // Filtered options based on search
+  const [searchText, setSearchText] = useState('');
 
-  // Update filtered options when search text or options change
   useEffect(() => {
     if (boxType === 'withSearch' && isDropdownOpen) {
-      const filtered = options.filter(item =>
-        item.name.toLowerCase().includes(searchText.toLowerCase()),
-      );
-      setFilteredOptions(filtered);
-    } else {
-      setFilteredOptions(options); // Reset to full list when not searching
+      onSearch?.(searchText);
     }
-  }, [searchText, options, isDropdownOpen, boxType]);
+  }, [searchText, isDropdownOpen, boxType, onSearch]);
 
   const toggleDropdown = () => {
     const newState = !isDropdownOpen;
@@ -52,6 +53,13 @@ const SelectBox = (props: Props) => {
     // Clear search text when closing dropdown
     if (!newState) {
       setSearchText('');
+      onSearch?.('');
+    }
+  };
+
+  const handleEndReached = () => {
+    if (hasMore && !loadingMore) {
+      onEndReached?.();
     }
   };
 
@@ -84,8 +92,8 @@ const SelectBox = (props: Props) => {
       {isDropdownOpen && (
         <View style={[styles.selectContainer, { height: SIZES.hp(100 / 4.2) }]}>
           <FlatList
-            data={filteredOptions}
-            keyExtractor={(item, index) => index.toString()}
+            data={options}
+            keyExtractor={(item, index) => item.id.toString()}
             renderItem={({ item }) => (
               <TouchableOpacity
                 onPress={() => {
@@ -93,12 +101,20 @@ const SelectBox = (props: Props) => {
                   selected?.(item.id);
                   setDropdownOpen(false);
                   onDropdownToggle?.(false);
-                  setSearchText(''); // Clear search text on selection
+                  setSearchText('');
+                  onSearch?.('');
                 }}
               >
                 <Text style={styles.dropdownItem}>{item.name}</Text>
               </TouchableOpacity>
             )}
+            onEndReached={handleEndReached}
+            onEndReachedThreshold={0.1} // Trigger when 10% from the bottom
+            ListFooterComponent={
+              loadingMore ? (
+                <Text style={styles.loadingText}>Loading more...</Text>
+              ) : null
+            }
           />
         </View>
       )}
@@ -163,5 +179,10 @@ const styles = StyleSheet.create({
     fontSize: SIZES.wp(14 / 4.2),
     color: COLORS.grey,
     paddingVertical: SIZES.wp(18 / 4.2), // Prevent extra padding
+  },
+  loadingText: {
+    textAlign: 'center',
+    color: COLORS.grey,
+    padding: SIZES.wp(10 / 4.2),
   },
 });

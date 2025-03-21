@@ -29,18 +29,38 @@ const AssignDriverModal = ({
   const toast = useToast();
 
   const [value, setValue] = useState(null);
-  const [isFocus, setIsFocus] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
   const [deliveryAgentsData, setDeliveryAgentsData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const fetchDeliveryAgents = async () => {
+  const fetchDeliveryAgents = async (
+    page: number = 1,
+    append: boolean = false,
+    query: string = searchQuery,
+  ) => {
     try {
-      const data = await deliveryAgents();
+      const data = await deliveryAgents(page, query);
       const drivers = data.data.map(item => ({ name: item.name, id: item.id }));
       //   console.log(data.data);
 
-      setDeliveryAgentsData(drivers);
+      if (append) {
+        setDeliveryAgentsData(prev => {
+          const existingIds = new Set(prev.map(item => item.id));
+          const newDrivers = drivers.filter(
+            driver => !existingIds.has(driver.id),
+          );
+          return [...prev, ...newDrivers];
+        });
+      } else {
+        setDeliveryAgentsData(drivers);
+      }
+
+      // Check if there are more pages
+      setHasMore(data.pagination.next !== null);
+      setCurrentPage(page);
     } catch (err) {
       console.log(err);
     }
@@ -49,6 +69,20 @@ const AssignDriverModal = ({
   useEffect(() => {
     fetchDeliveryAgents();
   }, []);
+
+  const handleLoadMore = async () => {
+    if (!hasMore || loadingMore) return;
+
+    setLoadingMore(true);
+    await fetchDeliveryAgents(currentPage + 1, true, searchQuery);
+    setLoadingMore(false);
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setCurrentPage(1); // Reset pagination when search query changes
+    fetchDeliveryAgents(1, false, query); // Fetch first page with new query
+  };
 
   const CustomToast = () => {
     return (
@@ -103,35 +137,11 @@ const AssignDriverModal = ({
             placeholder="Select drivers"
             boxType="withSearch"
             selected={setValue}
+            onEndReached={handleLoadMore}
+            hasMore={hasMore}
+            loadingMore={loadingMore}
+            onSearch={handleSearch}
           />
-          {/* <Text style={styles.dropdownText}>Drivers</Text> */}
-          {/* <Dropdown
-                        style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
-                        data={deliveryAgentsData}
-                        labelField="name"
-                        valueField="id"
-                        // search
-                        // searchPlaceholder="Search drivers"
-                        placeholder={!isFocus ? 'Select drivers' : '...'}
-                        value={value}
-                        onFocus={() => {
-                            setIsFocus(true);
-                            setIsOpen(true);
-                        }}
-                        onBlur={() => {
-                            setIsFocus(false);
-                            setIsOpen(false);
-                        }}
-                        onChange={item => {
-                            setValue(item.id);
-                            setIsFocus(false);
-                            setIsOpen(false);
-                        }}
-                        dropdownPosition="bottom"
-                        maxHeight={300}
-                    /> */}
         </View>
         <Button
           label="Assign"

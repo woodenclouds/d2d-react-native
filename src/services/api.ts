@@ -30,7 +30,7 @@ export const loginUser = async (email: string, password: string) => {
     });
 
     if (response.data.StatusCode === 6000) {
-      const {access, refresh} = response.data.data.response;
+      const { access, refresh } = response.data.data.response;
       const userId = response.data.data.user_id;
       const role = response.data.data.role;
       const name = response.data.data.name;
@@ -50,7 +50,7 @@ export const loginUser = async (email: string, password: string) => {
       // Set Authorization header for future requests
       api.defaults.headers.common['Authorization'] = `Bearer ${access}`;
 
-      return {access, refresh, userId, role, name, is_delivery_manager};
+      return { access, refresh, userId, role, name, is_delivery_manager };
     } else {
       throw new Error('Invalid login credentials');
     }
@@ -70,7 +70,7 @@ export const checkInEmployee = async () => {
       '/attendances/employee/checkin/',
       {},
       {
-        headers: {Authorization: `Bearer ${token}`},
+        headers: { Authorization: `Bearer ${token}` },
       },
     );
 
@@ -93,7 +93,7 @@ export const leaveRequest = async (reason: string, start_date: string) => {
         start_date,
       },
       {
-        headers: {Authorization: `Bearer ${token}`},
+        headers: { Authorization: `Bearer ${token}` },
       },
     );
 
@@ -104,15 +104,17 @@ export const leaveRequest = async (reason: string, start_date: string) => {
   }
 };
 
-export const deliveryAgents = async () => {
+export const deliveryAgents = async (page: number = 1, query: string = '') => {
   try {
     const token = await AsyncStorage.getItem('authToken');
+    console.log(token, 'token');
+
     if (!token) throw new Error('User is not authenticated');
 
     const response = await api.get(
-      '/accounts/delivery-agents/',
+      `/accounts/delivery-agents/?page=${page}${query ? `&q=${query}` : ''}`,
       {
-        headers: {Authorization: `Bearer ${token}`},
+        headers: { Authorization: `Bearer ${token}` },
       },
     );
 
@@ -134,7 +136,7 @@ export const assignDriver = async (agent_id: any, orderid: any) => {
         delivery_agent: agent_id,
       },
       {
-        headers: {Authorization: `Bearer ${token}`},
+        headers: { Authorization: `Bearer ${token}` },
       },
     );
 
@@ -153,7 +155,7 @@ export const assignedOrders = async () => {
     const response = await api.get(
       '/orders/delivery-agent/orders/?order_type=assigned&is_delivered=false',
       {
-        headers: {Authorization: `Bearer ${token}`},
+        headers: { Authorization: `Bearer ${token}` },
       },
     );
 
@@ -172,7 +174,7 @@ export const unassignedOrders = async (page: number = 1) => {
     const response = await api.get(
       `/orders/?status=ready_to_dispatch&page=${page}`,
       {
-        headers: {Authorization: `Bearer ${token}`},
+        headers: { Authorization: `Bearer ${token}` },
       },
     );
 
@@ -191,7 +193,7 @@ export const pickupOrders = async () => {
     const response = await api.get(
       '/orders/delivery-agent/orders/?order_type=assigned&order_status=in_transit',
       {
-        headers: {Authorization: `Bearer ${token}`},
+        headers: { Authorization: `Bearer ${token}` },
       },
     );
 
@@ -210,7 +212,7 @@ export const attemptedOrders = async () => {
     const response = await api.get(
       '/orders/delivery-agent/orders/?order_type=assigned&order_status=attempted',
       {
-        headers: {Authorization: `Bearer ${token}`},
+        headers: { Authorization: `Bearer ${token}` },
       },
     );
 
@@ -234,7 +236,7 @@ export const filteredOrder = async (
     const response = await api.get(
       `/orders/delivery-agent/orders/?order_type=${order_type}&pharmacy=${pharmacy}&order_status=${order_status}&delivery_type=${delivery_type}`,
       {
-        headers: {Authorization: `Bearer ${token}`},
+        headers: { Authorization: `Bearer ${token}` },
       },
     );
 
@@ -251,7 +253,7 @@ export const getNotifications = async () => {
     if (!token) throw new Error('User is not authenticated');
 
     const response = await api.get('/notifications/', {
-      headers: {Authorization: `Bearer ${token}`},
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     return response.data;
@@ -268,7 +270,7 @@ export const orderReports = async () => {
     if (!token) throw new Error('User is not authenticated');
 
     const response = await api.get('/orders/delivery-agent/reports/', {
-      headers: {Authorization: `Bearer ${token}`},
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     return response.data.data;
@@ -284,7 +286,7 @@ export const orderHistory = async () => {
     if (!token) throw new Error('User is not authenticated');
 
     const response = await api.get('/orders/delivery-agent/order-history/', {
-      headers: {Authorization: `Bearer ${token}`},
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     return response.data;
@@ -300,7 +302,7 @@ export const getProfile = async () => {
     if (!token) throw new Error('User is not authenticated');
 
     const response = await api.get('/accounts/delivery-agent/profile/', {
-      headers: {Authorization: `Bearer ${token}`},
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     return response.data;
@@ -316,7 +318,7 @@ export const getAttendances = async () => {
     if (!token) throw new Error('User is not authenticated');
 
     const response = await api.get('/attendances/attendances/', {
-      headers: {Authorization: `Bearer ${token}`},
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     return response.data;
@@ -332,7 +334,7 @@ export const getPharmacies = async (search: string) => {
     if (!token) throw new Error('User is not authenticated');
 
     const response = await api.get(`/accounts/pharmacies/?q=` + search, {
-      headers: {Authorization: `Bearer ${token}`},
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     return response.data;
@@ -423,7 +425,7 @@ export const submitAttemptedOrder = async (
         notes: notes,
       },
       {
-        headers: {Authorization: `Bearer ${token}`},
+        headers: { Authorization: `Bearer ${token}` },
       },
     );
 
@@ -442,7 +444,7 @@ export const PharmacyWiseOrders = async (pharmacy: string, status: string) => {
     const response = await api.get(
       `/orders/?pharmacy=${pharmacy}&status=${status}&is_mobile=true`,
       {
-        headers: {Authorization: `Bearer ${token}`},
+        headers: { Authorization: `Bearer ${token}` },
       },
     );
 
@@ -468,7 +470,7 @@ export const submitPickupOrder = async (
         notes: notes,
       },
       {
-        headers: {Authorization: `Bearer ${token}`},
+        headers: { Authorization: `Bearer ${token}` },
       },
     );
 
@@ -491,7 +493,7 @@ export const checkOutEmployee = async (checkin_id: number) => {
         checkin_id,
       },
       {
-        headers: {Authorization: `Bearer ${token}`},
+        headers: { Authorization: `Bearer ${token}` },
       },
     );
 
