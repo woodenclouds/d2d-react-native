@@ -51,7 +51,8 @@ const CardItem = (props: Props) => {
         style={[
           styles.cardContainer,
           { borderColor: currentIndex === index ? COLORS.primary : '#fff' },
-        ]}>
+        ]}
+      >
         <View style={styles.rowContainer}>
           {/* <GreenBox /> */}
           <View>
@@ -68,21 +69,13 @@ const CardItem = (props: Props) => {
           <View style={styles.contentSide}>
             <Text style={styles.streetName} numberOfLines={1}>
               {/* {item?.address} */}
-              {
-                item.is_pickup ? (
-                  item.next_action === 'pickup' ? (
-                    item?.address || item?.location
-                  ) : (
-                    item?.pharmacy_address || item?.location
-                  )
-                ) : (
-                  item.next_action === 'pickup' ? (
-                    item?.pharmacy_address || item?.location
-                  ) : (
-                    item?.address || item?.location
-                  )
-                )
-              }
+              {item.is_pickup
+                ? item.next_action === 'pickup'
+                  ? item?.address || item?.location
+                  : item?.pharmacy_address || item?.location
+                : item.next_action === 'pickup'
+                ? item?.pharmacy_address || item?.location
+                : item?.address || item?.location}
             </Text>
             <View style={styles.rowTextView}>
               {/* <Text style={styles.statusText}>Delivery</Text> */}
@@ -96,7 +89,9 @@ const CardItem = (props: Props) => {
               {/* <Text style={styles.distanceText}>2km</Text> */}
               {item?.order_type && <DeliveryVehicleIcon />}
             </View>
-            <View style={[styles.rowTextView, { marginTop: SIZES.wp(16 / 4.2) }]}>
+            <View
+              style={[styles.rowTextView, { marginTop: SIZES.wp(16 / 4.2) }]}
+            >
               <Text style={styles.detailsText}>View Details</Text>
               <NavigateIcon />
             </View>

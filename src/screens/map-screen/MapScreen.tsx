@@ -6,25 +6,29 @@ import {
   Alert,
   Image,
 } from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
-import MapView, {PROVIDER_GOOGLE, Marker, Polyline} from 'react-native-maps';
-import {SIZES} from '@app/themes/themes';
+import React, { useEffect, useRef, useState } from 'react';
+import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from 'react-native-maps';
+import { SIZES } from '@app/themes/themes';
 import GetLocation from 'react-native-get-location';
 import SafeAreaWrapper from '@app/components/SafeAreaWrapper';
 import CommonHeader from '@app/components/CommonHeader';
 import SwipableView from './includes/SwipableView';
 import ReportIcon from '@app/assets/icons/report_icon_blue.svg';
 import ReportIconGrey from '@app/assets/icons/report_icon_grey.svg';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import {useFocusEffect, useRoute} from '@react-navigation/native';
-import {assignedOrders, getDirections, getPharmacies} from '@app/services/api';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useFocusEffect, useRoute } from '@react-navigation/native';
+import {
+  assignedOrders,
+  getDirections,
+  getPharmacies,
+} from '@app/services/api';
 import BottomModal from '@app/components/BottomModal';
 import CenterModalBox from '@app/components/CenterModalBox';
 import RouteDetailsModal from './includes/RouteDetailsModal';
 import DestinationReachedModal from './includes/DestinationReachedModal';
 import OrderDetailsUpdateModal from './includes/OrderDetailsUpdateModal';
-import {navigate} from '@app/services/navigationService';
-import {useAuth} from '../../context/AuthContext';
+import { navigate } from '@app/services/navigationService';
+import { useAuth } from '../../context/AuthContext';
 import greenPin from '@app/assets/images/green_pin.png';
 import bluePin from '@app/assets/images/blue_pin.png';
 import orangePin from '@app/assets/images/orange_pin.png';
@@ -36,9 +40,9 @@ import selectedSkyblue from '@app/assets/images/selected_skyblue.png';
 import selectedViolet from '@app/assets/images/selected_violet.png';
 import selectedBlue from '@app/assets/images/selected_blue.png';
 import blueCar from '@app/assets/images/blue_car.png';
-import {distance} from '@turf/turf'; // Keep Turf for distance calculation
-import {point} from '@turf/helpers';
-import {openGoogleMapsNavigation} from '@app/utils/navigationUtils';
+import { distance } from '@turf/turf'; // Keep Turf for distance calculation
+import { point } from '@turf/helpers';
+import { openGoogleMapsNavigation } from '@app/utils/navigationUtils';
 import MoreInfoContainer from './includes/MoreInfoContainer';
 
 type Props = {};
@@ -60,7 +64,7 @@ type RouteParams = {
 
 const MapScreen = (props: Props) => {
   const route = useRoute();
-  const {state, resetOrderDetailsUpdated} = useAuth();
+  const { state, resetOrderDetailsUpdated } = useAuth();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [detailsModal, setDetailsModal] = useState(false);
   const [isDestinationReached, setDestinationReached] = useState(false);
@@ -108,7 +112,7 @@ const MapScreen = (props: Props) => {
       })
       .catch(error => {
         setMyLocation([0, 0]);
-        const {code, message} = error;
+        const { code, message } = error;
         console.warn(code, message);
         setMapLoader(false);
       });
@@ -241,10 +245,37 @@ const MapScreen = (props: Props) => {
   };
 
   const handleGoogleMapsNavigation = () => {
-    openGoogleMapsNavigation(
-      orders[currentIndex].latitude,
-      orders[currentIndex].longitude,
-    );
+    // openGoogleMapsNavigation(
+    //   orders[currentIndex].latitude,
+    //   orders[currentIndex].longitude,
+    // );
+    const item = orders[currentIndex];
+
+    if (item.is_pickup) {
+      if (item.next_action === 'pickup') {
+        if (!item.latitude || !item.longitude) return;
+        openGoogleMapsNavigation(item.latitude, item.longitude);
+      } else {
+        const pharmacyLocation = item.pharmacy_location;
+        if (!pharmacyLocation.latitude || !pharmacyLocation.longitude) return;
+        openGoogleMapsNavigation(
+          pharmacyLocation.latitude,
+          pharmacyLocation.longitude,
+        );
+      }
+    } else {
+      if (item.next_action === 'pickup') {
+        const pharmacyLocation = item.pharmacy_location;
+        if (!pharmacyLocation.latitude || !pharmacyLocation.longitude) return;
+        openGoogleMapsNavigation(
+          pharmacyLocation.latitude,
+          pharmacyLocation.longitude,
+        );
+      } else {
+        if (!item.latitude || !item.longitude) return;
+        openGoogleMapsNavigation(item.latitude, item.longitude);
+      }
+    }
   };
 
   if ((isLoading && pharmacyLoader) || mapLoader) {
@@ -289,10 +320,14 @@ const MapScreen = (props: Props) => {
                 latitude: myLocation[1],
                 longitude: myLocation[0],
               }}
-              title="My Location">
+              title="My Location"
+            >
               <Image
                 source={blueCar}
-                style={{width: SIZES.wp(40 / 4.2), height: SIZES.wp(40 / 4.2)}}
+                style={{
+                  width: SIZES.wp(40 / 4.2),
+                  height: SIZES.wp(40 / 4.2),
+                }}
                 resizeMode="contain"
               />
             </Marker>
@@ -301,12 +336,18 @@ const MapScreen = (props: Props) => {
           {/* Order markers */}
           {orders.map((order, index) => (
             <Marker
+              // onPress={() => {
+              //   setCurrentIndex(index + 1);
+              //   setOrderData(order);
+              //   // setDetailsModal(true);
+              // }}
               key={index}
               coordinate={{
                 latitude: order.latitude,
                 longitude: order.longitude,
               }}
-              title={order.recepient_name}>
+              title={order.recepient_name}
+            >
               <Image
                 source={
                   // order.is_pickup === true && order.next_action === 'pickup' ?
@@ -351,7 +392,8 @@ const MapScreen = (props: Props) => {
                 latitude: pharmacy?.location_data?.latitude,
                 longitude: pharmacy.location_data?.longitude,
               }}
-              title={pharmacy.name}>
+              title={pharmacy.name}
+            >
               <Image
                 source={bluePin}
                 style={{

@@ -9,13 +9,17 @@ import {
   Linking,
   AppStateStatus,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
+import React, { useEffect, useState } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Navigation from '@app/navigations/Navigation';
-import {navigationRef} from '@app/services/navigationService';
-import {ToastProvider} from 'react-native-toast-notifications';
-import {AuthProvider} from './src/context/AuthContext';
+import { navigationRef } from '@app/services/navigationService';
+import { ToastProvider } from 'react-native-toast-notifications';
+import { AuthProvider } from './src/context/AuthContext';
+// import {
+//   handleForegroundNotifications,
+//   handleBackgroundNotifications,
+// } from './src/services/notificationService';
 
 type Props = {};
 
@@ -50,6 +54,16 @@ const App = () => {
     };
   }, [appState]);
 
+  // Set up notification handlers
+  // useEffect(() => {
+  //   const unsubscribeForeground = handleForegroundNotifications();
+  //   handleBackgroundNotifications();
+
+  //   return () => {
+  //     unsubscribeForeground();
+  //   };
+  // }, []);
+
   const checkAndRequestLocationPermission = async () => {
     if (Platform.OS === 'android') {
       try {
@@ -72,7 +86,7 @@ const App = () => {
                 onPress: () => Linking.openSettings(),
               },
             ],
-            {cancelable: true},
+            { cancelable: true },
           );
         }
       } catch (error) {
@@ -109,7 +123,8 @@ const App = () => {
           const RenderToast = toastOptions.data.renderToast;
 
           return <RenderToast />;
-        }}>
+        }}
+      >
         <SafeAreaProvider>
           <NavigationContainer ref={navigationRef}>
             <Navigation />

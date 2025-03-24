@@ -1,6 +1,6 @@
-import {Dimensions, StyleSheet} from 'react-native';
-import React, {useState} from 'react';
-import {SIZES} from '@app/themes/themes';
+import { Dimensions, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { SIZES } from '@app/themes/themes';
 import CardItem from './CardItem';
 import Animated, {
   useSharedValue,
@@ -19,7 +19,7 @@ type Props = {
 const width = SIZES.wp('100%');
 
 const SwipableView = (props: Props) => {
-  const {points, currentIndex, setCurrentIndex, onSwipeEnd, setDetailsModal} =
+  const { points, currentIndex, setCurrentIndex, onSwipeEnd, setDetailsModal } =
     props;
 
   const scrollX = useSharedValue(0);
@@ -39,7 +39,8 @@ const SwipableView = (props: Props) => {
       pagingEnabled
       showsHorizontalScrollIndicator={false}
       onMomentumScrollEnd={onSwipeEnd}
-      onScroll={onScrollHandler}>
+      onScroll={onScrollHandler}
+    >
       {points.map((item, index) => (
         <CardItem
           index={index}

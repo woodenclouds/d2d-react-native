@@ -95,7 +95,8 @@ const HistoryItemCard = (props: Props) => {
     <TouchableOpacity
       style={styles.container}
       activeOpacity={0.5}
-      onPress={() => onToggle()}>
+      onPress={() => onToggle()}
+    >
       <View style={styles.rowView}>
         <View>
           {props.type === 'history' ? (
@@ -112,11 +113,11 @@ const HistoryItemCard = (props: Props) => {
           <Text style={styles.itemText} numberOfLines={1}>
             {item.is_pickup
               ? item.next_action === 'pickup'
-                ? item?.address
-                : item?.pharmacy_address
-              : item.next_action === 'delivery'
                 ? item?.pharmacy_address
-                : item?.address}
+                : item?.address
+              : item.next_action === 'delivery'
+              ? item?.address
+              : item?.pharmacy_address}
           </Text>
           {props.type !== 'history' ? (
             <>
@@ -148,7 +149,8 @@ const HistoryItemCard = (props: Props) => {
         <Animated.View
           ref={listRef}
           collapsable={false}
-          style={[styles.contentView]}>
+          style={[styles.contentView]}
+        >
           <View style={styles.lineView} />
           <View style={styles.imageContainer}>
             <View style={styles.rowViewSpace}>
@@ -217,7 +219,8 @@ const HistoryItemCard = (props: Props) => {
                           ? 'delivered'
                           : 'pickup',
                     });
-                  }}>
+                  }}
+                >
                   <Text style={styles.buttonText}>
                     {item.next_action === 'delivery'
                       ? 'Deliver'
@@ -227,7 +230,8 @@ const HistoryItemCard = (props: Props) => {
                 <TouchableOpacity
                   onPress={onAttemptPress}
                   disabled={onAttemptPress ? false : true}
-                  style={[styles.buttonContainer, { borderColor: '#FF8A3C' }]}>
+                  style={[styles.buttonContainer, { borderColor: '#FF8A3C' }]}
+                >
                   <Text style={[styles.buttonText, { color: '#FF8A3C' }]}>
                     {item.attempted_count} Attempted
                   </Text>

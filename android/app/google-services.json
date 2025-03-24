@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "722052201864",
+    "project_id": "d2d-healthcare-b3aa2",
+    "storage_bucket": "d2d-healthcare-b3aa2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:722052201864:android:bd99ec39ac1127431b8e3d",
+        "android_client_info": {
+          "package_name": "com.d2d"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBkHDisxvXNTqUDk8tYkXvFSP265DygBVI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

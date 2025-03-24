@@ -9,18 +9,18 @@ import {
   Permission,
   Platform,
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
-import {SIZES, FONTS} from '@app/themes/themes';
+import React, { useState, useEffect } from 'react';
+import { SIZES, FONTS } from '@app/themes/themes';
 import SafeAreaWrapper from '@app/components/SafeAreaWrapper';
 import CommonHeader from '@app/components/CommonHeader';
 import RecepientDetailsCard from './includes/RecepientDetailsCard';
 import DeliveryDetailsCard from './includes/DeliveryDetailsCard';
 import PaymentDetailsCard from './includes/PaymentDetailsCard';
 import Button from '@app/components/Button';
-import {navigateBack} from '@app/services/navigationService';
-import {useRoute, useNavigation} from '@react-navigation/native'; // Import useNavigation
+import { navigateBack } from '@app/services/navigationService';
+import { useRoute, useNavigation } from '@react-navigation/native'; // Import useNavigation
 import * as ImagePicker from 'react-native-image-picker'; // For image picking
-import {useAuth} from '../../context/AuthContext'; // Import useAuth (adjust the path)
+import { useAuth } from '../../context/AuthContext'; // Import useAuth (adjust the path)
 import BottomModal from '@app/components/BottomModal';
 import {
   submitAttemptedOrder,
@@ -54,7 +54,7 @@ type RouteParams = {
 
 const DeliveryUpdate = (props: Props) => {
   const route = useRoute();
-  const {state, clearSignature, setOrderDetailsUpdated, updateTempItem} =
+  const { state, clearSignature, setOrderDetailsUpdated, updateTempItem } =
     useAuth(); // Use Auth context to get signature and clear it
   const [deliveryStatus, setDeliveryStatus] = useState('Delivered');
   const [orderData, setOrderData] = useState<RouteParams['data'] | null>(null);
@@ -204,9 +204,7 @@ const DeliveryUpdate = (props: Props) => {
   const handleSubmit = async () => {
     if (!orderData) return;
 
-    console.log(images, 'images');
-
-    if (state.signature === null && images === []) {
+    if (state.signature === null && images.length === 0) {
       Alert.alert('Error', 'Please add signature or images before submitting.');
       return;
     }
