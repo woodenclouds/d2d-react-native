@@ -1,6 +1,6 @@
-import {StyleSheet, Text, TextInput, View} from 'react-native';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
 import React from 'react';
-import {SIZES, FONTS} from '@app/themes/themes';
+import { SIZES, FONTS } from '@app/themes/themes';
 import CommonRadioButton from '@app/components/CommonRadioButton';
 
 type Props = {
@@ -23,10 +23,14 @@ const methods_type = [
     id: 3,
     name: 'Cheque',
   },
+  {
+    id: 4,
+    name: 'Not payed',
+  },
 ];
 
 const PaymentDetailsCard = (props: Props) => {
-  const {amount, paymentMethod, setPaymentMethod} = props;
+  const { amount, paymentMethod, setPaymentMethod } = props;
 
   console.log(amount, 'amount');
 

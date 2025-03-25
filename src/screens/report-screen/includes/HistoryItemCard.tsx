@@ -31,6 +31,8 @@ type Props = {
 const HistoryItemCard = (props: Props) => {
   const { item, onAttemptPress } = props;
 
+  console.log(item, 'item');
+
   const arrowDegree = useSharedValue('0deg');
   const animateHight = useSharedValue(0);
   const isExpanded = useSharedValue(false);
@@ -155,7 +157,9 @@ const HistoryItemCard = (props: Props) => {
           <View style={styles.imageContainer}>
             <View style={styles.rowViewSpace}>
               <Text style={styles.labelText}>Order id</Text>
-              <Text style={styles.itemTextSmall}>{item?.order_id}</Text>
+              <Text style={styles.itemTextSmall}>
+                {item?.order_id ?? '----'}
+              </Text>
             </View>
             <View style={styles.rowViewSpace}>
               <Text style={styles.labelText}>Pickup/Delivery</Text>
@@ -165,11 +169,15 @@ const HistoryItemCard = (props: Props) => {
             </View>
             <View style={styles.rowViewSpace}>
               <Text style={styles.labelText}>Order type</Text>
-              <Text style={styles.itemTextSmall}>{item?.order_type}</Text>
+              <Text style={styles.itemTextSmall}>
+                {item?.order_type ?? '---'}
+              </Text>
             </View>
             <View style={styles.rowViewSpace}>
               <Text style={styles.labelText}>Pharmacy name</Text>
-              <Text style={styles.itemTextSmall}>{item?.pharmacy_name}</Text>
+              <Text style={styles.itemTextSmall}>
+                {item?.pharmacy_name ?? '---'}
+              </Text>
             </View>
           </View>
           <View style={styles.rowViewSpace}>
@@ -191,9 +199,15 @@ const HistoryItemCard = (props: Props) => {
             </Text>
           </View>
           <View style={styles.rowViewSpace}>
+            <Text style={styles.labelText}>Delivery date</Text>
+            <Text style={styles.itemTextSmall}>
+              {item?.delivery_date ?? '---'}
+            </Text>
+          </View>
+          <View style={styles.rowViewSpace}>
             <Text style={styles.labelText}>Delivery time</Text>
             <Text style={styles.itemTextSmall}>
-              Between {convertToAMPM(item?.from_time)} &{' '}
+              Before {/* {convertToAMPM(item?.from_time)} &{' '} */}
               {convertToAMPM(item?.to_time)}
             </Text>
           </View>
@@ -203,6 +217,24 @@ const HistoryItemCard = (props: Props) => {
               {!item?.is_pickup
                 ? item?.address
                 : `${item?.pharmacy_name}, \n ${item?.pharmacy_address}`}
+            </Text>
+          </View>
+          <View style={styles.rowViewSpace}>
+            <Text style={styles.labelText}>Buzzer code</Text>
+            <Text style={styles.itemTextSmall}>
+              {item?.buzzer_code ?? '---'}
+            </Text>
+          </View>
+          <View style={styles.rowViewSpace}>
+            <Text style={styles.labelText}>Unit number</Text>
+            <Text style={styles.itemTextSmall}>
+              {item?.unit_number ?? '---'}
+            </Text>
+          </View>
+          <View style={styles.rowViewSpace}>
+            <Text style={styles.labelText}>Delivery notes</Text>
+            <Text style={styles.itemTextSmall}>
+              {item?.delivery_note ?? '---'}
             </Text>
           </View>
           {props.type !== 'history' && <View style={styles.lineView} />}

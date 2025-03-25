@@ -41,7 +41,7 @@ const SelectBox = (props: Props) => {
   const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
-    if (boxType === 'withSearch' && isDropdownOpen) {
+    if (boxType === 'withSearch' && isDropdownOpen && searchText !== '') {
       onSearch?.(searchText);
     }
   }, [searchText, isDropdownOpen, boxType, onSearch]);

@@ -63,7 +63,7 @@ const DeliveryUpdate = (props: Props) => {
   const [notes, setNotes] = useState<string>(''); // Store notes
   const [isBulkOrder, setIsBulkOrder] = useState(false);
   // const [amount, setAmount] = useState('0');
-  const [paymentMethod, setPaymentMethod] = useState('Cash');
+  const [paymentMethod, setPaymentMethod] = useState('');
   const [imageselectModal, setImageSelectModal] = useState(false);
 
   // Fetch initial data from navigation params
@@ -206,6 +206,15 @@ const DeliveryUpdate = (props: Props) => {
 
     if (state.signature === null && images.length === 0) {
       Alert.alert('Error', 'Please add signature or images before submitting.');
+      return;
+    }
+
+    if (
+      !orderData.is_prepaid &&
+      orderData.bill_amount > 0 &&
+      paymentMethod === ''
+    ) {
+      Alert.alert('Error', 'Please select payment method before submitting.');
       return;
     }
 
